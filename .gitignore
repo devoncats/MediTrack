@@ -1,0 +1,57 @@
+# ============================================================
+#  .gitignore — Android Studio
+# ============================================================
+
+# Gradle build cache and wrapper outputs
+.gradle/
+**/build/
+build/
+
+# Local SDK/NDK paths — machine-specific, never commit
+local.properties
+
+# IntelliJ / Android Studio IDE files
+.idea/
+*.iml
+*.hprof
+*.eml
+*.xml.bak
+out/
+
+# Keystore files — NEVER commit signing keys
+*.jks
+*.keystore
+release.properties
+keystore.properties
+
+# Google Services config (Firebase)
+# Uncomment if you store it outside VCS:
+# google-services.json
+
+# ProGuard mapping files (generated per build)
+**/mapping.txt
+**/seeds.txt
+**/usage.txt
+
+# Generated source folders (apt / kapt)
+**/generated/
+gen/
+
+# Capture files (Android Studio profiler)
+captures/
+
+# Kotlin build caches
+.kotlin/
+
+# OS-generated junk
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor backups
+*~
+*.bak
+*.swp
+*.swo
