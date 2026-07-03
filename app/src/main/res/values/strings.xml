@@ -1,8 +1,15 @@
 <resources>
     <string name="app_name">MediTrack</string>
 
+    <!-- Login -->
+    <string name="login_title">Iniciar sesión</string>
+    <string name="login_email_hint">Correo electrónico</string>
+    <string name="login_password_hint">Contraseña</string>
+    <string name="login_button">Iniciar sesión</string>
+    <string name="login_register_link">¿No tienes cuenta? Regístrate</string>
+    <string name="login_error_invalid_credentials">Correo o contraseña incorrectos</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
-    <string name="placeholder_login">Login</string>
     <string name="placeholder_register">Registro</string>
     <string name="placeholder_med_list">Lista de medicamentos</string>
     <string name="placeholder_med_form">Formulario de medicamento</string>

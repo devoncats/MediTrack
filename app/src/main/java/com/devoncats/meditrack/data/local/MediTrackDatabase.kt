@@ -1,6 +1,8 @@
 package com.devoncats.meditrack.data.local
 
+import android.content.Context
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.devoncats.meditrack.data.local.dao.UserDao
@@ -29,5 +31,17 @@ abstract class MediTrackDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "meditrack.db"
+
+        @Volatile
+        private var instance: MediTrackDatabase? = null
+
+        fun getInstance(context: Context): MediTrackDatabase =
+            instance ?: synchronized(this) {
+                instance ?: Room.databaseBuilder(
+                    context.applicationContext,
+                    MediTrackDatabase::class.java,
+                    DATABASE_NAME
+                ).build().also { instance = it }
+            }
     }
 }

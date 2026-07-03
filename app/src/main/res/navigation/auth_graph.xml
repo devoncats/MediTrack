@@ -8,11 +8,26 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.devoncats.meditrack.presentation.auth.LoginFragment"
-        android:label="@string/placeholder_login"
+        android:label="@string/login_title"
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_login_to_register"
             app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_login_to_patientGraph"
+            app:destination="@id/patient_graph"
+            app:popUpTo="@id/auth_graph"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_login_to_caregiverGraph"
+            app:destination="@id/caregiver_graph"
+            app:popUpTo="@id/auth_graph"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_login_to_seniorGraph"
+            app:destination="@id/senior_graph"
+            app:popUpTo="@id/auth_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
