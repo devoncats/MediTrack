@@ -20,6 +20,7 @@ import com.devoncats.meditrack.data.local.entity.UserEntity
     version = 1,
     exportSchema = true
 )
+
 @TypeConverters(Converters::class)
 abstract class MediTrackDatabase : RoomDatabase() {
 

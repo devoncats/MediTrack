@@ -17,6 +17,7 @@ import androidx.room.PrimaryKey
         )
     ]
 )
+
 data class ScheduleEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
