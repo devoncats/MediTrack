@@ -3,6 +3,7 @@ package com.devoncats.meditrack.data.local
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.devoncats.meditrack.data.local.dao.UserDao
 import com.devoncats.meditrack.data.local.entity.EmergencyContactEntity
 import com.devoncats.meditrack.data.local.entity.MedicationEntity
 import com.devoncats.meditrack.data.local.entity.MedicationLogEntity
@@ -23,6 +24,8 @@ import com.devoncats.meditrack.data.local.entity.UserEntity
 
 @TypeConverters(Converters::class)
 abstract class MediTrackDatabase : RoomDatabase() {
+
+    abstract fun userDao(): UserDao
 
     companion object {
         const val DATABASE_NAME = "meditrack.db"

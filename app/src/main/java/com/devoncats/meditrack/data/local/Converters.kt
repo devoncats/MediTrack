@@ -2,7 +2,7 @@ package com.devoncats.meditrack.data.local
 
 import androidx.room.TypeConverter
 import com.devoncats.meditrack.data.local.entity.MedicationLogStatus
-import com.devoncats.meditrack.data.local.entity.UserRole
+import com.devoncats.meditrack.domain.model.UserRole
 
 class Converters {
     @TypeConverter

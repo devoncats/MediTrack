@@ -1,4 +1,4 @@
-package com.devoncats.meditrack.data.local.entity
+package com.devoncats.meditrack.domain.model
 
 enum class UserRole {
     PATIENT,
