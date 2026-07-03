@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">MediTrack</string>
+
+    <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
+    <string name="placeholder_login">Login</string>
+    <string name="placeholder_register">Registro</string>
+    <string name="placeholder_med_list">Lista de medicamentos</string>
+    <string name="placeholder_med_form">Formulario de medicamento</string>
+    <string name="placeholder_med_detail">Detalle de medicamento</string>
+    <string name="placeholder_alert">Confirmar toma</string>
+    <string name="placeholder_dashboard">Dashboard del cuidador</string>
+    <string name="placeholder_senior_list">Lista de pacientes mayores</string>
+    <string name="placeholder_senior_detail">Detalle de paciente mayor</string>
+    <string name="placeholder_missed_dose_alert">Alerta de toma perdida</string>
+    <string name="placeholder_senior_med_list">Mis medicamentos</string>
+    <string name="placeholder_senior_alert">Confirmar toma</string>
 </resources>

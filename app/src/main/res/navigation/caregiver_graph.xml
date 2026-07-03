@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/caregiver_graph"
+    app:startDestination="@id/dashboardFragment">
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.devoncats.meditrack.presentation.caregiver.DashboardFragment"
+        android:label="@string/placeholder_dashboard"
+        tools:layout="@layout/fragment_dashboard">
+        <action
+            android:id="@+id/action_dashboard_to_seniorList"
+            app:destination="@id/seniorListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/seniorListFragment"
+        android:name="com.devoncats.meditrack.presentation.caregiver.SeniorListFragment"
+        android:label="@string/placeholder_senior_list"
+        tools:layout="@layout/fragment_senior_list">
+        <action
+            android:id="@+id/action_seniorList_to_seniorDetail"
+            app:destination="@id/seniorDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/seniorDetailFragment"
+        android:name="com.devoncats.meditrack.presentation.caregiver.SeniorDetailFragment"
+        android:label="@string/placeholder_senior_detail"
+        tools:layout="@layout/fragment_senior_detail">
+        <argument
+            android:name="seniorUserId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_seniorDetail_to_seniorMedForm"
+            app:destination="@id/seniorMedFormFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/seniorMedFormFragment"
+        android:name="com.devoncats.meditrack.presentation.patient.MedFormFragment"
+        android:label="@string/placeholder_med_form"
+        tools:layout="@layout/fragment_med_form">
+        <argument
+            android:name="seniorUserId"
+            app:argType="long" />
+        <argument
+            android:name="medicationId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/missedDoseAlertFragment"
+        android:name="com.devoncats.meditrack.presentation.caregiver.MissedDoseAlertFragment"
+        android:label="@string/placeholder_missed_dose_alert"
+        tools:layout="@layout/fragment_missed_dose_alert">
+        <argument
+            android:name="logId"
+            app:argType="long" />
+        <deepLink app:uri="meditrack://missedDose/{logId}" />
+    </fragment>
+
+</navigation>
