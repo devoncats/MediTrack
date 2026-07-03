@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/patient_graph"
+    app:startDestination="@id/medListFragment">
+
+    <fragment
+        android:id="@+id/medListFragment"
+        android:name="com.devoncats.meditrack.presentation.patient.MedListFragment"
+        android:label="@string/placeholder_med_list"
+        tools:layout="@layout/fragment_med_list">
+        <action
+            android:id="@+id/action_medList_to_medForm"
+            app:destination="@id/medFormFragment" />
+        <action
+            android:id="@+id/action_medList_to_medDetail"
+            app:destination="@id/medDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/medFormFragment"
+        android:name="com.devoncats.meditrack.presentation.patient.MedFormFragment"
+        android:label="@string/placeholder_med_form"
+        tools:layout="@layout/fragment_med_form">
+        <argument
+            android:name="medicationId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/medDetailFragment"
+        android:name="com.devoncats.meditrack.presentation.patient.MedDetailFragment"
+        android:label="@string/placeholder_med_detail"
+        tools:layout="@layout/fragment_med_detail">
+        <argument
+            android:name="medicationId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_medDetail_to_medForm"
+            app:destination="@id/medFormFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/alertFragment"
+        android:name="com.devoncats.meditrack.presentation.patient.AlertFragment"
+        android:label="@string/placeholder_alert"
+        tools:layout="@layout/fragment_alert">
+        <argument
+            android:name="scheduleId"
+            app:argType="long" />
+        <deepLink app:uri="meditrack://alert/{scheduleId}" />
+    </fragment>
+
+</navigation>

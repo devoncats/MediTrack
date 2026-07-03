@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/senior_graph"
+    app:startDestination="@id/seniorMedListFragment">
+
+    <fragment
+        android:id="@+id/seniorMedListFragment"
+        android:name="com.devoncats.meditrack.presentation.senior.SeniorMedListFragment"
+        android:label="@string/placeholder_senior_med_list"
+        tools:layout="@layout/fragment_senior_med_list" />
+
+    <fragment
+        android:id="@+id/seniorAlertFragment"
+        android:name="com.devoncats.meditrack.presentation.senior.SeniorAlertFragment"
+        android:label="@string/placeholder_senior_alert"
+        tools:layout="@layout/fragment_senior_alert">
+        <argument
+            android:name="scheduleId"
+            app:argType="long" />
+        <deepLink app:uri="meditrack://seniorAlert/{scheduleId}" />
+    </fragment>
+
+</navigation>
