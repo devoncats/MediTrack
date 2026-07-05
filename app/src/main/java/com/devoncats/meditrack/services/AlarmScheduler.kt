@@ -62,6 +62,10 @@ class AlarmScheduler(private val context: Context) {
         workManager.cancelUniqueWork(missedDoseWorkName(scheduleId))
     }
 
+    fun cancelMissedDoseCheck(scheduleId: Long) {
+        workManager.cancelUniqueWork(missedDoseWorkName(scheduleId))
+    }
+
     private fun enqueueMissedDoseCheck(scheduleId: Long, medicationId: Long, triggerAtMillis: Long) {
         val delayMillis = (triggerAtMillis - System.currentTimeMillis()) +
             TimeUnit.MINUTES.toMillis(MISSED_DOSE_CHECK_DELAY_MINUTES)

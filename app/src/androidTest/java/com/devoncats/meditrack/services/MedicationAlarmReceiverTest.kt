@@ -93,4 +93,56 @@ class MedicationAlarmReceiverTest {
 
         notificationManager.cancel(activeNotification.id)
     }
+
+    @Test
+    fun onReceive_forSeniorPatientOwnedMedication_notificationOmitsPostponeAction(): Unit = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val seniorEmail = "alarm-receiver-senior-test@meditrack.com"
+        val userDao = MediTrackDatabase.getInstance(context).userDao()
+        userDao.findByEmail(seniorEmail)?.let { userDao.delete(it) }
+        val seniorId = userDao.insert(
+            UserEntity(
+                name = "Alarm Receiver Senior Test",
+                email = seniorEmail,
+                passwordHash = PasswordHasher.hash("whatever123"),
+                role = UserRole.SENIOR_PATIENT,
+                caregiverId = null
+            )
+        )
+        val seniorMedicationId = MediTrackDatabase.getInstance(context).medicationDao().insert(
+            MedicationEntity(
+                name = "Ibuprofeno Senior",
+                dose = "400mg",
+                frequency = "Cada 12 horas",
+                instructions = null,
+                ownerUserId = seniorId,
+                photoUri = null,
+                createdAt = System.currentTimeMillis()
+            )
+        )
+        val scheduleId = 5_002L
+
+        val intent = Intent(context, MedicationAlarmReceiver::class.java).apply {
+            putExtra(AlarmScheduler.EXTRA_MEDICATION_ID, seniorMedicationId)
+            putExtra(AlarmScheduler.EXTRA_SCHEDULE_ID, scheduleId)
+        }
+        context.sendBroadcast(intent)
+
+        Thread.sleep(1500)
+
+        val logs = MediTrackDatabase.getInstance(context).medicationLogDao()
+            .observeByMedication(seniorMedicationId)
+            .getOrAwaitValue()
+        val insertedLog = logs?.firstOrNull()
+        assertNotNull("expected a MedicationLog to be created", insertedLog)
+
+        val notificationManager = context.getSystemService(NotificationManager::class.java)
+        val activeNotification = notificationManager.activeNotifications
+            .firstOrNull { it.id == insertedLog!!.id.toInt() }
+        assertNotNull("expected a notification to be posted", activeNotification)
+
+        assertEquals(1, activeNotification!!.notification.actions?.size)
+
+        notificationManager.cancel(activeNotification.id)
+    }
 }

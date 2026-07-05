@@ -14,7 +14,7 @@
     <fragment
         android:id="@+id/seniorAlertFragment"
         android:name="com.devoncats.meditrack.presentation.senior.SeniorAlertFragment"
-        android:label="@string/placeholder_senior_alert"
+        android:label="@string/senior_alert_title"
         tools:layout="@layout/fragment_senior_alert">
         <argument
             android:name="scheduleId"

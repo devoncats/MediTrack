@@ -6,6 +6,7 @@ import android.content.Intent
 import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.data.local.entity.MedicationLogEntity
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
+import com.devoncats.meditrack.domain.model.UserRole
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,12 +31,14 @@ class MedicationAlarmReceiver : BroadcastReceiver() {
                             status = MedicationLogStatus.PENDING
                         )
                     )
+                    val owner = database.userDao().findById(medication.ownerUserId)
                     NotificationHelper(context).showMedicationAlarmNotification(
                         logId = logId,
                         scheduleId = scheduleId,
                         medicationId = medicationId,
                         medicationName = medication.name,
-                        dose = medication.dose
+                        dose = medication.dose,
+                        isSeniorPatient = owner?.role == UserRole.SENIOR_PATIENT
                     )
                 }
             } finally {
