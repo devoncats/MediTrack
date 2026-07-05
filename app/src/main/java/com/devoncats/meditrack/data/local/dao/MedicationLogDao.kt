@@ -45,4 +45,26 @@ interface MedicationLogDao {
         startInclusive: Long,
         endExclusive: Long
     ): LiveData<List<MedicationLogEntity>>
+
+    @Query(
+        """
+        SELECT medication_logs.id AS logId, users.name AS seniorName, medications.name AS medicationName,
+               medication_logs.scheduledDatetime AS scheduledDatetime
+        FROM medication_logs
+        INNER JOIN medications ON medications.id = medication_logs.medicationId
+        INNER JOIN users ON users.id = medications.ownerUserId
+        WHERE users.caregiverId = :caregiverId
+          AND users.role = 'SENIOR_PATIENT'
+          AND medication_logs.status = 'MISSED'
+        ORDER BY medication_logs.scheduledDatetime DESC
+        """
+    )
+    fun observeMissedDoseAlertsForCaregiver(caregiverId: Long): LiveData<List<MissedDoseAlertRow>>
 }
+
+data class MissedDoseAlertRow(
+    val logId: Long,
+    val seniorName: String,
+    val medicationName: String,
+    val scheduledDatetime: Long
+)

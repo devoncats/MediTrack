@@ -10,6 +10,7 @@ import com.devoncats.meditrack.data.local.entity.MedicationLogEntity
 import com.devoncats.meditrack.data.local.entity.ScheduleEntity
 import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.MedicationLog
+import com.devoncats.meditrack.domain.model.MissedDoseAlert
 import com.devoncats.meditrack.domain.model.Schedule
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 
@@ -80,6 +81,18 @@ class MedicationRepositoryImpl(
     ): LiveData<List<MedicationLog>> =
         medicationLogDao.observeByOwnerBetween(ownerUserId, startInclusive, endExclusive)
             .map { list -> list.map { it.toDomain() } }
+
+    override fun observeMissedDoseAlertsForCaregiver(caregiverId: Long): LiveData<List<MissedDoseAlert>> =
+        medicationLogDao.observeMissedDoseAlertsForCaregiver(caregiverId).map { rows ->
+            rows.map {
+                MissedDoseAlert(
+                    logId = it.logId,
+                    seniorName = it.seniorName,
+                    medicationName = it.medicationName,
+                    scheduledDatetime = it.scheduledDatetime
+                )
+            }
+        }
 
     private fun MedicationEntity.toDomain() = Medication(
         id = id,
