@@ -24,8 +24,15 @@
     <!-- Sesion -->
     <string name="logout_button">Cerrar sesión</string>
 
+    <!-- Lista de medicamentos (Paciente) -->
+    <string name="med_list_title">Mis medicamentos</string>
+    <string name="med_list_empty_message">Aún no tienes medicamentos registrados. Toca el botón + para agregar el primero.</string>
+    <string name="med_list_add_content_description">Agregar medicamento</string>
+    <string name="med_status_confirmed">Confirmado</string>
+    <string name="med_status_pending">Pendiente</string>
+    <string name="med_status_missed">Omitido</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
-    <string name="placeholder_med_list">Lista de medicamentos</string>
     <string name="placeholder_med_form">Formulario de medicamento</string>
     <string name="placeholder_med_detail">Detalle de medicamento</string>
     <string name="placeholder_alert">Confirmar toma</string>

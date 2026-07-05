@@ -57,7 +57,7 @@ class MainActivitySessionTest {
         sessionManager.saveSession(user.id, UserRole.PATIENT.name)
 
         ActivityScenario.launch(MainActivity::class.java).use {
-            onView(withId(R.id.medListPlaceholder)).check(matches(isDisplayed()))
+            onView(withId(R.id.medListTitle)).check(matches(isDisplayed()))
         }
     }
 
