@@ -25,12 +25,24 @@ class MedListFragment : Fragment(R.layout.fragment_med_list) {
         val emptyStateTextView = view.findViewById<View>(R.id.emptyStateTextView)
         val addMedicationFab = view.findViewById<FloatingActionButton>(R.id.addMedicationFab)
 
-        val adapter = MedicationListAdapter { item ->
-            findNavController().navigate(
-                R.id.action_medList_to_medDetail,
-                bundleOf("medicationId" to item.medication.id)
-            )
-        }
+        val adapter = MedicationListAdapter(
+            onItemClick = { item ->
+                findNavController().navigate(
+                    R.id.action_medList_to_medDetail,
+                    bundleOf("medicationId" to item.medication.id)
+                )
+            },
+            onPendingStatusClick = { item ->
+                viewModel.findScheduleIdForAlert(item.medication.id) { scheduleId ->
+                    if (scheduleId != null) {
+                        findNavController().navigate(
+                            R.id.action_medList_to_alert,
+                            bundleOf("scheduleId" to scheduleId)
+                        )
+                    }
+                }
+            }
+        )
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 

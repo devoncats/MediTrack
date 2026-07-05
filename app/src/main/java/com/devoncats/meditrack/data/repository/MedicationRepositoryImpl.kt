@@ -49,6 +49,9 @@ class MedicationRepositoryImpl(
     override suspend fun getSchedulesByMedication(medicationId: Long): List<Schedule> =
         scheduleDao.getByMedication(medicationId).map { it.toDomain() }
 
+    override suspend fun getScheduleById(id: Long): Schedule? =
+        scheduleDao.findById(id)?.toDomain()
+
     override fun observeSchedulesByMedication(medicationId: Long): LiveData<List<Schedule>> =
         scheduleDao.observeByMedication(medicationId).map { list -> list.map { it.toDomain() } }
 
@@ -60,6 +63,12 @@ class MedicationRepositoryImpl(
 
     override suspend fun deleteLog(log: MedicationLog) =
         medicationLogDao.delete(log.toEntity())
+
+    override suspend fun getLogById(id: Long): MedicationLog? =
+        medicationLogDao.findById(id)?.toDomain()
+
+    override suspend fun getLatestPendingLogForMedication(medicationId: Long): MedicationLog? =
+        medicationLogDao.findLatestPendingByMedication(medicationId)?.toDomain()
 
     override fun observeLogsByMedication(medicationId: Long): LiveData<List<MedicationLog>> =
         medicationLogDao.observeByMedication(medicationId).map { list -> list.map { it.toDomain() } }

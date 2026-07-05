@@ -70,8 +70,13 @@
     <string name="med_detail_delete_confirm_message">¿Seguro que deseas eliminar %1$s? Se cancelaran todas sus alarmas y no se podra deshacer.</string>
     <string name="med_detail_delete_confirm_positive">Eliminar</string>
 
+    <!-- Alerta de confirmacion de toma -->
+    <string name="alert_title">Es hora de tu medicamento</string>
+    <string name="alert_confirm_button">Confirmar toma</string>
+    <string name="alert_postpone_button">Posponer 15 min</string>
+    <string name="alert_dismiss_button">Omitir</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
-    <string name="placeholder_alert">Confirmar toma</string>
     <string name="placeholder_dashboard">Dashboard del cuidador</string>
     <string name="placeholder_senior_list">Lista de pacientes mayores</string>
     <string name="placeholder_senior_detail">Detalle de paciente mayor</string>
