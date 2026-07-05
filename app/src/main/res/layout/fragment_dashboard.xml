@@ -6,7 +6,6 @@
     android:layout_height="match_parent">
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/dashboardScroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -27,7 +26,6 @@
                 android:padding="16dp">
 
                 <TextView
-                    android:id="@+id/myMedicationsTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="@string/med_list_title"
@@ -72,7 +70,6 @@
                 android:background="?attr/colorOutlineVariant" />
 
             <TextView
-                android:id="@+id/seniorsSectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
@@ -100,7 +97,6 @@
                 android:background="?attr/colorOutlineVariant" />
 
             <TextView
-                android:id="@+id/missedDosesSectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
