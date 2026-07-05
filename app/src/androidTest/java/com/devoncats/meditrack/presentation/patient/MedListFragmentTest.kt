@@ -94,7 +94,7 @@ class MedListFragmentTest {
         ActivityScenario.launch(MainActivity::class.java).use {
             onView(withId(R.id.addMedicationFab)).perform(click())
 
-            onView(withText(R.string.placeholder_med_form)).check(matches(isDisplayed()))
+            onView(withId(R.id.medFormTitle)).check(matches(isDisplayed()))
         }
     }
 
