@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/medListFragment"
         android:name="com.devoncats.meditrack.presentation.patient.MedListFragment"
-        android:label="@string/placeholder_med_list"
+        android:label="@string/med_list_title"
         tools:layout="@layout/fragment_med_list">
         <action
             android:id="@+id/action_medList_to_medForm"
