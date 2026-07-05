@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">MediTrack</string>
 
+    <!-- Notificaciones -->
+    <string name="notification_channel_name">Alarmas de medicamentos</string>
+    <string name="notification_medication_alarm_title">Hora de tomar %1$s</string>
+    <string name="notification_medication_alarm_text">Dosis: %1$s</string>
+
     <!-- Login -->
     <string name="login_title">Iniciar sesión</string>
     <string name="login_email_hint">Correo electrónico</string>

@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.os.ParcelFileDescriptor
 import androidx.core.content.ContextCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -21,7 +22,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNotNull
-import org.junit.Assume
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -121,15 +121,7 @@ class AlarmSchedulerTest {
         val action = "com.devoncats.meditrack.test.ALARM_FIRED"
         val latch = CountDownLatch(1)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        // On API 31+ this special permission must be granted out-of-band (e.g. via
-        // `adb shell appops set <pkg> SCHEDULE_EXACT_ALARM allow`) and does not survive
-        // a fresh install, which happens on every connectedAndroidTest run. Skip rather
-        // than fail when it isn't granted; AlarmScheduler itself already falls back to a
-        // non-exact set() in that case (see schedule()).
-        Assume.assumeTrue(
-            "exact alarm permission not granted in this environment",
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()
-        )
+        grantExactAlarmPermissionIfNeeded(alarmManager)
 
         var firedAtMillis = 0L
         val receiver = object : BroadcastReceiver() {
@@ -161,5 +153,28 @@ class AlarmSchedulerTest {
         } finally {
             context.unregisterReceiver(receiver)
         }
+    }
+
+    /**
+     * SCHEDULE_EXACT_ALARM (API 31+) is a special app-op permission, not a standard
+     * "dangerous" runtime permission, so UiAutomation.grantRuntimePermission() does not
+     * apply to it. It also does not survive the fresh install that happens on every
+     * connectedAndroidTest run. Grant it the same way `adb shell appops set <pkg>
+     * SCHEDULE_EXACT_ALARM allow` would, but from inside the test itself via
+     * UiAutomation.executeShellCommand, so the test is self-sufficient.
+     */
+    private fun grantExactAlarmPermissionIfNeeded(alarmManager: AlarmManager) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) return
+
+        val uiAutomation = InstrumentationRegistry.getInstrumentation().uiAutomation
+        val pfd = uiAutomation.executeShellCommand("appops set ${context.packageName} SCHEDULE_EXACT_ALARM allow")
+        ParcelFileDescriptor.AutoCloseInputStream(pfd).use { it.readBytes() }
+
+        var attempts = 0
+        while (!alarmManager.canScheduleExactAlarms() && attempts < 10) {
+            Thread.sleep(100)
+            attempts++
+        }
+        assertTrue("failed to grant SCHEDULE_EXACT_ALARM via appops", alarmManager.canScheduleExactAlarms())
     }
 }
