@@ -9,11 +9,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/placeholder_dashboard"
-        app:layout_constraintBottom_toTopOf="@id/logoutButton"
+        app:layout_constraintBottom_toTopOf="@id/addSeniorPatientButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/addSeniorPatientButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/create_senior_title"
+        app:layout_constraintBottom_toTopOf="@id/logoutButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dashboardPlaceholder" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logoutButton"
@@ -24,6 +35,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dashboardPlaceholder" />
+        app:layout_constraintTop_toBottomOf="@id/addSeniorPatientButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
