@@ -30,7 +30,16 @@
             android:name="medicationId"
             app:argType="long"
             android:defaultValue="-1L" />
+        <action
+            android:id="@+id/action_medForm_to_camera"
+            app:destination="@id/cameraFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.devoncats.meditrack.presentation.camera.CameraFragment"
+        android:label="@string/camera_title"
+        tools:layout="@layout/fragment_camera" />
 
     <fragment
         android:id="@+id/medDetailFragment"

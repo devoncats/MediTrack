@@ -1,15 +1,19 @@
 package com.devoncats.meditrack.presentation.patient
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
+import com.devoncats.meditrack.presentation.camera.CameraFragment
 import com.devoncats.meditrack.utils.toCode
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
@@ -35,6 +39,8 @@ class MedFormFragment : Fragment(R.layout.fragment_med_form) {
 
     private val selectedTimes = sortedSetOf<LocalTime>()
 
+    private var capturedPhotoUri: Uri? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -43,6 +49,8 @@ class MedFormFragment : Fragment(R.layout.fragment_med_form) {
         val doseEditText = view.findViewById<TextInputEditText>(R.id.doseEditText)
         val frequencyEditText = view.findViewById<TextInputEditText>(R.id.frequencyEditText)
         val instructionsEditText = view.findViewById<TextInputEditText>(R.id.instructionsEditText)
+        val photoPreviewImageView = view.findViewById<ImageView>(R.id.photoPreviewImageView)
+        val takePhotoButton = view.findViewById<MaterialButton>(R.id.takePhotoButton)
         val daysOfWeekChipGroup = view.findViewById<ChipGroup>(R.id.daysOfWeekChipGroup)
         val timesChipGroup = view.findViewById<ChipGroup>(R.id.timesChipGroup)
         val addTimeButton = view.findViewById<MaterialButton>(R.id.addTimeButton)
@@ -50,6 +58,18 @@ class MedFormFragment : Fragment(R.layout.fragment_med_form) {
         val saveButton = view.findViewById<MaterialButton>(R.id.saveButton)
 
         titleTextView.setText(if (viewModel.isEditMode) R.string.med_form_edit_title else R.string.med_form_title)
+
+        setFragmentResultListener(CameraFragment.RESULT_KEY) { _, bundle ->
+            val uriString = bundle.getString(CameraFragment.RESULT_PHOTO_URI) ?: return@setFragmentResultListener
+            capturedPhotoUri = Uri.parse(uriString)
+            photoPreviewImageView.setImageURI(capturedPhotoUri)
+            photoPreviewImageView.visibility = View.VISIBLE
+            takePhotoButton.setText(R.string.med_form_retake_photo_button)
+        }
+
+        takePhotoButton.setOnClickListener {
+            findNavController().navigate(R.id.action_medForm_to_camera)
+        }
 
         fun selectedDays(): Set<DayOfWeek> = daysOfWeekChipGroup.checkedChipIds
             .mapNotNull { chipId -> daysOfWeekChipGroup.findViewById<Chip>(chipId)?.tag as? String }

@@ -71,6 +71,9 @@
     <string name="med_form_add_time">Agregar hora</string>
     <string name="med_form_validation_error">Completa nombre, dosis, frecuencia, al menos un día y un horario</string>
     <string name="med_form_save_button">Guardar</string>
+    <string name="med_form_photo_label">Foto del medicamento (opcional)</string>
+    <string name="med_form_take_photo_button">Tomar foto</string>
+    <string name="med_form_retake_photo_button">Volver a tomar foto</string>
 
     <!-- Detalle de medicamento -->
     <string name="med_detail_title">Detalle de medicamento</string>
@@ -132,4 +135,10 @@
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
     <string name="placeholder_senior_med_list">Mis medicamentos</string>
     <string name="placeholder_senior_alert">Confirmar toma</string>
+
+    <!-- Camara -->
+    <string name="camera_title">Tomar foto</string>
+    <string name="camera_capture_content_description">Capturar foto</string>
+    <string name="camera_permission_denied_message">Se necesita permiso de cámara para tomar una foto del medicamento. Otórgalo para continuar.</string>
+    <string name="camera_permission_grant_button">Conceder permiso</string>
 </resources>
