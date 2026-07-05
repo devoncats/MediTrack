@@ -43,6 +43,10 @@
             android:exported="false" />
 
         <receiver
+            android:name=".services.MedicationActionReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".services.BootReceiver"
             android:exported="true">
             <intent-filter>
