@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/dashboardFragment"
         android:name="com.devoncats.meditrack.presentation.caregiver.DashboardFragment"
-        android:label="@string/placeholder_dashboard"
+        android:label="@string/dashboard_title"
         tools:layout="@layout/fragment_dashboard">
         <action
             android:id="@+id/action_dashboard_to_seniorList"

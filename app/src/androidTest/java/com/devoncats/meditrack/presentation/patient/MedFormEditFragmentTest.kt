@@ -133,6 +133,7 @@ class MedFormEditFragmentTest {
 
             onView(withId(R.id.doseEditText)).perform(clearText(), typeText("1000mg"))
             closeSoftKeyboard()
+            Thread.sleep(300)
 
             // remove the pre-filled 08:00 time chip and add a new one
             onView(withText("08:00")).perform(clickChipCloseIcon())
