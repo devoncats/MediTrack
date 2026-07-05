@@ -34,6 +34,7 @@
 
     <!-- Formulario de medicamento (agregar) -->
     <string name="med_form_title">Agregar medicamento</string>
+    <string name="med_form_edit_title">Editar medicamento</string>
     <string name="med_form_name_hint">Nombre</string>
     <string name="med_form_dose_hint">Dosis</string>
     <string name="med_form_frequency_hint">Frecuencia (ej. Cada 8 horas)</string>

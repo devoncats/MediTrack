@@ -8,7 +8,7 @@ import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.data.repository.MedicationRepositoryImpl
 import com.devoncats.meditrack.services.AlarmScheduler
 
-class MedFormViewModelFactory(context: Context) : ViewModelProvider.Factory {
+class MedFormViewModelFactory(context: Context, private val medicationId: Long) : ViewModelProvider.Factory {
 
     private val appContext = context.applicationContext
     private val medicationRepository = MedicationRepositoryImpl(
@@ -21,5 +21,5 @@ class MedFormViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        MedFormViewModel(medicationRepository, alarmScheduler, ownerUserId) as T
+        MedFormViewModel(medicationRepository, alarmScheduler, ownerUserId, medicationId) as T
 }
