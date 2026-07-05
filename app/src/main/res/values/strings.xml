@@ -5,6 +5,8 @@
     <string name="notification_channel_name">Alarmas de medicamentos</string>
     <string name="notification_medication_alarm_title">Hora de tomar %1$s</string>
     <string name="notification_medication_alarm_text">Dosis: %1$s</string>
+    <string name="notification_missed_dose_title">%1$s no confirmó su toma</string>
+    <string name="notification_missed_dose_text">Se omitió la toma de %1$s</string>
     <string name="notification_action_confirm">Confirmar toma</string>
     <string name="notification_action_postpone">Posponer 15 min</string>
 

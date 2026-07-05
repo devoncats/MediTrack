@@ -11,6 +11,8 @@ import android.os.ParcelFileDescriptor
 import androidx.core.content.ContextCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.data.local.entity.MedicationEntity
 import com.devoncats.meditrack.data.local.entity.ScheduleEntity
@@ -111,6 +113,27 @@ class AlarmSchedulerTest {
 
         alarmScheduler.cancel(scheduleId1)
         alarmScheduler.cancel(scheduleId2)
+    }
+
+    @Test
+    fun schedule_enqueuesMissedDoseCheckWork_andCancelRemovesIt() {
+        val scheduleId = 4_003L
+        val workName = AlarmScheduler.missedDoseWorkName(scheduleId)
+        val workManager = WorkManager.getInstance(context)
+        alarmScheduler.cancel(scheduleId)
+
+        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+
+        val enqueuedInfos = workManager.getWorkInfosForUniqueWork(workName).get()
+        assertTrue(
+            "expected an enqueued missed-dose check work",
+            enqueuedInfos.any { it.state == WorkInfo.State.ENQUEUED }
+        )
+
+        alarmScheduler.cancel(scheduleId)
+
+        val afterCancelInfos = workManager.getWorkInfosForUniqueWork(workName).get()
+        assertTrue(afterCancelInfos.all { it.state.isFinished })
     }
 
     @Test
