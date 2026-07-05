@@ -8,7 +8,11 @@ import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.data.repository.MedicationRepositoryImpl
 import com.devoncats.meditrack.services.AlarmScheduler
 
-class MedFormViewModelFactory(context: Context, private val medicationId: Long) : ViewModelProvider.Factory {
+class MedFormViewModelFactory(
+    context: Context,
+    private val medicationId: Long,
+    private val seniorUserId: Long = NO_SENIOR_USER_ID
+) : ViewModelProvider.Factory {
 
     private val appContext = context.applicationContext
     private val medicationRepository = MedicationRepositoryImpl(
@@ -17,9 +21,17 @@ class MedFormViewModelFactory(context: Context, private val medicationId: Long) 
         MediTrackDatabase.getInstance(appContext).medicationLogDao()
     )
     private val alarmScheduler = AlarmScheduler(appContext)
-    private val ownerUserId = SessionManager(appContext).getUserId()
+    private val ownerUserId = if (seniorUserId != NO_SENIOR_USER_ID) {
+        seniorUserId
+    } else {
+        SessionManager(appContext).getUserId()
+    }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
         MedFormViewModel(medicationRepository, alarmScheduler, ownerUserId, medicationId) as T
+
+    companion object {
+        const val NO_SENIOR_USER_ID = -1L
+    }
 }

@@ -29,7 +29,7 @@ class SeniorListFragment : Fragment(R.layout.fragment_senior_list) {
             onItemClick = { item ->
                 findNavController().navigate(
                     R.id.action_seniorList_to_seniorDetail,
-                    bundleOf("seniorUserId" to item.senior.id)
+                    bundleOf("seniorUserId" to item.senior.id, "seniorName" to item.senior.name)
                 )
             },
             onDeleteClick = { item -> showDeleteConfirmation(item) }

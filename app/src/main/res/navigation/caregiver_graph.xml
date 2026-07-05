@@ -86,14 +86,20 @@
     <fragment
         android:id="@+id/seniorDetailFragment"
         android:name="com.devoncats.meditrack.presentation.caregiver.SeniorDetailFragment"
-        android:label="@string/placeholder_senior_detail"
+        android:label="{seniorName}"
         tools:layout="@layout/fragment_senior_detail">
         <argument
             android:name="seniorUserId"
             app:argType="long" />
+        <argument
+            android:name="seniorName"
+            app:argType="string" />
         <action
             android:id="@+id/action_seniorDetail_to_seniorMedForm"
             app:destination="@id/seniorMedFormFragment" />
+        <action
+            android:id="@+id/action_seniorDetail_to_seniorMedDetail"
+            app:destination="@id/seniorMedDetailFragment" />
     </fragment>
 
     <fragment
@@ -108,6 +114,22 @@
             android:name="medicationId"
             app:argType="long"
             android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/seniorMedDetailFragment"
+        android:name="com.devoncats.meditrack.presentation.patient.MedDetailFragment"
+        android:label="@string/med_detail_title"
+        tools:layout="@layout/fragment_med_detail">
+        <argument
+            android:name="medicationId"
+            app:argType="long" />
+        <argument
+            android:name="seniorUserId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_medDetail_to_medForm"
+            app:destination="@id/seniorMedFormFragment" />
     </fragment>
 
     <fragment

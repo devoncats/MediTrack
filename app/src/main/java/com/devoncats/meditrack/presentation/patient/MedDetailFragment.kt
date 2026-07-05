@@ -25,6 +25,10 @@ class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
     private val medicationId: Long
         get() = arguments?.getLong("medicationId", -1L) ?: -1L
 
+    private val seniorUserId: Long
+        get() = arguments?.getLong("seniorUserId", MedFormViewModelFactory.NO_SENIOR_USER_ID)
+            ?: MedFormViewModelFactory.NO_SENIOR_USER_ID
+
     private val viewModel: MedDetailViewModel by viewModels {
         MedDetailViewModelFactory(requireContext(), medicationId)
     }
@@ -56,10 +60,11 @@ class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
             photoImageView.visibility = if (medication.photoUri.isNullOrBlank()) View.GONE else View.VISIBLE
 
             editButton.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_medDetail_to_medForm,
-                    bundleOf("medicationId" to medication.id)
-                )
+                val args = bundleOf("medicationId" to medication.id)
+                if (seniorUserId != MedFormViewModelFactory.NO_SENIOR_USER_ID) {
+                    args.putLong("seniorUserId", seniorUserId)
+                }
+                findNavController().navigate(R.id.action_medDetail_to_medForm, args)
             }
 
             deleteButton.setOnClickListener {

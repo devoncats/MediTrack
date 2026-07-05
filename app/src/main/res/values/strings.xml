@@ -103,9 +103,12 @@
     <string name="senior_delete_confirm_message">¿Seguro que deseas eliminar a %1$s? Se eliminarán también sus medicamentos, horarios, registros y credenciales. Esta acción no se puede deshacer.</string>
     <string name="senior_delete_confirm_positive">Eliminar</string>
 
+    <!-- Detalle de paciente mayor -->
+    <string name="senior_detail_medications_empty">Este paciente mayor aún no tiene medicamentos registrados. Toca el botón + para agregar el primero.</string>
+    <string name="senior_detail_add_medication_content_description">Agregar medicamento</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
     <string name="placeholder_dashboard">Dashboard del cuidador</string>
-    <string name="placeholder_senior_detail">Detalle de paciente mayor</string>
     <string name="placeholder_missed_dose_alert">Alerta de toma perdida</string>
     <string name="placeholder_senior_med_list">Mis medicamentos</string>
     <string name="placeholder_senior_alert">Confirmar toma</string>
