@@ -1,2 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <!-- Primary (medical blue) -->
+    <color name="md_primary_light">#0369A1</color>
+    <color name="md_on_primary_light">#FFFFFF</color>
+    <color name="md_primary_container_light">#D6EEFC</color>
+    <color name="md_on_primary_container_light">#042A3D</color>
+
+    <color name="md_primary_dark">#7DD3FC</color>
+    <color name="md_on_primary_dark">#073B5C</color>
+    <color name="md_primary_container_dark">#0369A1</color>
+    <color name="md_on_primary_container_dark">#E0F2FE</color>
+
+    <!-- Secondary (teal accent) -->
+    <color name="md_secondary_light">#0E7490</color>
+    <color name="md_on_secondary_light">#FFFFFF</color>
+    <color name="md_secondary_container_light">#CFFAFE</color>
+    <color name="md_on_secondary_container_light">#062A32</color>
+
+    <color name="md_secondary_dark">#67E8F9</color>
+    <color name="md_on_secondary_dark">#164E63</color>
+    <color name="md_secondary_container_dark">#0E7490</color>
+    <color name="md_on_secondary_container_dark">#CFFAFE</color>
+
+    <!-- Error / destructive -->
+    <color name="md_error_light">#DC2626</color>
+    <color name="md_on_error_light">#FFFFFF</color>
+    <color name="md_error_container_light">#FEE2E2</color>
+    <color name="md_on_error_container_light">#7F1D1D</color>
+
+    <color name="md_error_dark">#FCA5A5</color>
+    <color name="md_on_error_dark">#7F1D1D</color>
+    <color name="md_error_container_dark">#B91C1C</color>
+    <color name="md_on_error_container_dark">#FEE2E2</color>
+
+    <!-- Neutral surfaces -->
+    <color name="md_background_light">#F7FBFE</color>
+    <color name="md_on_background_light">#1A1C1E</color>
+    <color name="md_surface_light">#F7FBFE</color>
+    <color name="md_on_surface_light">#1A1C1E</color>
+    <color name="md_surface_variant_light">#DDE3EA</color>
+    <color name="md_on_surface_variant_light">#41474D</color>
+    <color name="md_outline_light">#71787E</color>
+    <color name="md_outline_variant_light">#C1C7CE</color>
+
+    <color name="md_background_dark">#101416</color>
+    <color name="md_on_background_dark">#E1E2E4</color>
+    <color name="md_surface_dark">#101416</color>
+    <color name="md_on_surface_dark">#E1E2E4</color>
+    <color name="md_surface_variant_dark">#41474D</color>
+    <color name="md_on_surface_variant_dark">#C1C7CE</color>
+    <color name="md_outline_dark">#8B9198</color>
+    <color name="md_outline_variant_dark">#41474D</color>
+
+    <!--
+        Semantic status colors (medication log status): pending / confirmed / missed.
+        Plain names (no _light/_dark suffix) so the same R.color reference resolves the
+        correct variant automatically via values-night/colors.xml.
+    -->
+    <color name="status_pending_container">#FEF3C7</color>
+    <color name="status_pending_on_container">#78350F</color>
+    <color name="status_confirmed_container">#DCFCE7</color>
+    <color name="status_confirmed_on_container">#14532D</color>
+    <color name="status_missed_container">#FEE2E2</color>
+    <color name="status_missed_on_container">#7F1D1D</color>
+</resources>

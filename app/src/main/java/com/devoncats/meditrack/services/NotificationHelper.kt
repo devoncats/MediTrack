@@ -33,7 +33,7 @@ class NotificationHelper(private val context: Context) {
             .createPendingIntent()
 
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setSmallIcon(R.drawable.ic_lucide_bell)
             .setContentTitle(context.getString(R.string.notification_medication_alarm_title, medicationName))
             .setContentText(context.getString(R.string.notification_medication_alarm_text, dose))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -41,14 +41,14 @@ class NotificationHelper(private val context: Context) {
             .setAutoCancel(true)
             .setContentIntent(contentIntent)
             .addAction(
-                android.R.drawable.ic_menu_send,
+                R.drawable.ic_lucide_check_circle,
                 context.getString(R.string.notification_action_confirm),
                 confirmActionPendingIntent(logId)
             )
 
         if (!isSeniorPatient) {
             notificationBuilder.addAction(
-                android.R.drawable.ic_menu_recent_history,
+                R.drawable.ic_lucide_clock,
                 context.getString(R.string.notification_action_postpone),
                 postponeActionPendingIntent(logId, scheduleId, medicationId)
             )
@@ -68,7 +68,7 @@ class NotificationHelper(private val context: Context) {
             .createPendingIntent()
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setSmallIcon(R.drawable.ic_lucide_alert_triangle)
             .setContentTitle(context.getString(R.string.notification_missed_dose_title, seniorName))
             .setContentText(context.getString(R.string.notification_missed_dose_text, medicationName))
             .setPriority(NotificationCompat.PRIORITY_HIGH)

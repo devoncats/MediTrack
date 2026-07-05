@@ -89,6 +89,7 @@
         android:layout_marginBottom="16dp"
         android:enabled="false"
         android:text="@string/missed_dose_alert_call_button"
+        app:icon="@drawable/ic_lucide_phone"
         app:layout_constraintBottom_toTopOf="@id/dismissButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

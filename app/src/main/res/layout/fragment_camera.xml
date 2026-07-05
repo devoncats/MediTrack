@@ -32,6 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/camera_permission_denied_message"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
             android:textColor="@android:color/white"
             android:textAlignment="center" />
 
@@ -50,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:contentDescription="@string/camera_capture_content_description"
-        app:srcCompat="@android:drawable/ic_menu_camera"
+        app:srcCompat="@drawable/ic_lucide_camera"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

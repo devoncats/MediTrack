@@ -26,6 +26,7 @@
         android:minHeight="48dp"
         android:text="@string/logout_button"
         android:textSize="16sp"
+        app:icon="@drawable/ic_lucide_log_out"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

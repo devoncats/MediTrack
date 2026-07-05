@@ -202,14 +202,13 @@ class MedDetailFragmentTest {
         override fun check(view: View?, noViewFoundException: NoMatchingViewException?) {
             if (noViewFoundException != null) throw noViewFoundException
             val imageView = view as ImageView
-            val placeholder = androidx.core.content.ContextCompat.getDrawable(
-                imageView.context,
-                android.R.drawable.ic_menu_gallery
-            )
-            assertEquals(
-                "expected the placeholder icon to be set",
-                placeholder?.constantState,
-                imageView.drawable.constantState
+            // A real photo is always loaded as a BitmapDrawable; the placeholder is the
+            // ic_lucide_image vector, so this distinguishes them without depending on the
+            // vector's tinted constantState (which isn't guaranteed to be shared/identical
+            // across separately-inflated instances).
+            assertFalse(
+                "expected the placeholder icon (not a photo bitmap) to be set",
+                imageView.drawable is BitmapDrawable
             )
         }
     }

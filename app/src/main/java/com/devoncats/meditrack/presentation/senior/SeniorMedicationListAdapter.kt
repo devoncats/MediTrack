@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.devoncats.meditrack.R
-import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.services.FileStorageHelper
+import com.devoncats.meditrack.utils.StatusChipBinder
 import com.google.android.material.chip.Chip
 
 class SeniorMedicationListAdapter : ListAdapter<SeniorMedicationItem, SeniorMedicationListAdapter.ViewHolder>(DiffCallback) {
@@ -43,16 +43,10 @@ class SeniorMedicationListAdapter : ListAdapter<SeniorMedicationItem, SeniorMedi
             if (bitmap != null) {
                 thumbnailImageView.setImageBitmap(bitmap)
             } else {
-                thumbnailImageView.setImageResource(android.R.drawable.ic_menu_gallery)
+                thumbnailImageView.setImageResource(R.drawable.ic_lucide_image)
             }
 
-            statusChip.setText(
-                when (item.todayStatus) {
-                    MedicationLogStatus.CONFIRMED -> R.string.med_status_confirmed
-                    MedicationLogStatus.MISSED -> R.string.med_status_missed
-                    MedicationLogStatus.PENDING, null -> R.string.med_status_pending
-                }
-            )
+            StatusChipBinder.bind(statusChip, item.todayStatus)
         }
     }
 
