@@ -5,6 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.devoncats.meditrack.data.local.dao.MedicationDao
+import com.devoncats.meditrack.data.local.dao.MedicationLogDao
+import com.devoncats.meditrack.data.local.dao.ScheduleDao
 import com.devoncats.meditrack.data.local.dao.UserDao
 import com.devoncats.meditrack.data.local.entity.EmergencyContactEntity
 import com.devoncats.meditrack.data.local.entity.MedicationEntity
@@ -28,6 +31,9 @@ import com.devoncats.meditrack.data.local.entity.UserEntity
 abstract class MediTrackDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
+    abstract fun medicationDao(): MedicationDao
+    abstract fun scheduleDao(): ScheduleDao
+    abstract fun medicationLogDao(): MedicationLogDao
 
     companion object {
         const val DATABASE_NAME = "meditrack.db"

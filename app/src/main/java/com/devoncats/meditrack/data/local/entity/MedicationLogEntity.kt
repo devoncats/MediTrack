@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.devoncats.meditrack.domain.model.MedicationLogStatus
 
 @Entity(
     tableName = "medication_logs",
