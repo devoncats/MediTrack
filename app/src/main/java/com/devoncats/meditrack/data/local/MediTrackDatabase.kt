@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.devoncats.meditrack.data.local.dao.EmergencyContactDao
 import com.devoncats.meditrack.data.local.dao.MedicationDao
 import com.devoncats.meditrack.data.local.dao.MedicationLogDao
 import com.devoncats.meditrack.data.local.dao.ScheduleDao
@@ -34,6 +35,7 @@ abstract class MediTrackDatabase : RoomDatabase() {
     abstract fun medicationDao(): MedicationDao
     abstract fun scheduleDao(): ScheduleDao
     abstract fun medicationLogDao(): MedicationLogDao
+    abstract fun emergencyContactDao(): EmergencyContactDao
 
     companion object {
         const val DATABASE_NAME = "meditrack.db"

@@ -109,8 +109,15 @@
 
     <string name="dashboard_title">Dashboard del cuidador</string>
 
+    <!-- Alerta de toma omitida -->
+    <string name="missed_dose_alert_title">Alerta de toma omitida</string>
+    <string name="missed_dose_alert_medication_label">Medicamento omitido</string>
+    <string name="missed_dose_alert_scheduled_time_label">Hora programada</string>
+    <string name="missed_dose_alert_call_button">Llamar contacto de emergencia</string>
+    <string name="missed_dose_alert_dismiss_button">Descartar</string>
+    <string name="missed_dose_alert_no_contact_message">Este paciente mayor no tiene un contacto de emergencia registrado.</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
-    <string name="placeholder_missed_dose_alert">Alerta de toma perdida</string>
     <string name="placeholder_senior_med_list">Mis medicamentos</string>
     <string name="placeholder_senior_alert">Confirmar toma</string>
 </resources>
