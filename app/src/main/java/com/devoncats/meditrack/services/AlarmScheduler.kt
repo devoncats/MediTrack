@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.utils.toDayOfWeekOrNull
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -21,6 +22,13 @@ class AlarmScheduler(private val context: Context) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
         } else {
             alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+        }
+    }
+
+    suspend fun rescheduleAll() {
+        val scheduleDao = MediTrackDatabase.getInstance(context).scheduleDao()
+        scheduleDao.getAll().forEach { schedule ->
+            schedule(schedule.id, schedule.medicationId, schedule.time, schedule.daysOfWeek)
         }
     }
 

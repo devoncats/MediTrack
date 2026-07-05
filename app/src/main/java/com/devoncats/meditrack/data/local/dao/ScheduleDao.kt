@@ -25,6 +25,9 @@ interface ScheduleDao {
     @Query("SELECT * FROM schedules WHERE medicationId = :medicationId")
     suspend fun getByMedication(medicationId: Long): List<ScheduleEntity>
 
+    @Query("SELECT * FROM schedules")
+    suspend fun getAll(): List<ScheduleEntity>
+
     @Query("SELECT * FROM schedules WHERE medicationId = :medicationId")
     fun observeByMedication(medicationId: Long): LiveData<List<ScheduleEntity>>
 }
