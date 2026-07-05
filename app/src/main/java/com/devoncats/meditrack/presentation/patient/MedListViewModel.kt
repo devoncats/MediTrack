@@ -3,10 +3,12 @@ package com.devoncats.meditrack.presentation.patient
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.utils.DateUtils
+import kotlinx.coroutines.launch
 
 data class MedicationListItem(
     val medication: Medication,
@@ -14,9 +16,15 @@ data class MedicationListItem(
 )
 
 class MedListViewModel(
-    medicationRepository: MedicationRepository,
+    private val medicationRepository: MedicationRepository,
     ownerUserId: Long
 ) : ViewModel() {
+
+    fun findScheduleIdForAlert(medicationId: Long, onResult: (Long?) -> Unit) {
+        viewModelScope.launch {
+            onResult(medicationRepository.getSchedulesByMedication(medicationId).firstOrNull()?.id)
+        }
+    }
 
     val medicationItems: LiveData<List<MedicationListItem>> = MediatorLiveData<List<MedicationListItem>>().apply {
         val medicationsLiveData = medicationRepository.observeMedicationsByOwner(ownerUserId)

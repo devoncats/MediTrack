@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_medList_to_medDetail"
             app:destination="@id/medDetailFragment" />
+        <action
+            android:id="@+id/action_medList_to_alert"
+            app:destination="@id/alertFragment" />
     </fragment>
 
     <fragment
@@ -45,7 +48,7 @@
     <fragment
         android:id="@+id/alertFragment"
         android:name="com.devoncats.meditrack.presentation.patient.AlertFragment"
-        android:label="@string/placeholder_alert"
+        android:label="@string/alert_title"
         tools:layout="@layout/fragment_alert">
         <argument
             android:name="scheduleId"

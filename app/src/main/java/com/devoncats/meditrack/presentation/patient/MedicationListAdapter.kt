@@ -12,12 +12,13 @@ import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.google.android.material.chip.Chip
 
 class MedicationListAdapter(
-    private val onItemClick: (MedicationListItem) -> Unit
+    private val onItemClick: (MedicationListItem) -> Unit,
+    private val onPendingStatusClick: (MedicationListItem) -> Unit
 ) : ListAdapter<MedicationListItem, MedicationListAdapter.MedicationViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MedicationViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_medication, parent, false)
-        return MedicationViewHolder(view, onItemClick)
+        return MedicationViewHolder(view, onItemClick, onPendingStatusClick)
     }
 
     override fun onBindViewHolder(holder: MedicationViewHolder, position: Int) {
@@ -26,7 +27,8 @@ class MedicationListAdapter(
 
     class MedicationViewHolder(
         itemView: View,
-        private val onItemClick: (MedicationListItem) -> Unit
+        private val onItemClick: (MedicationListItem) -> Unit,
+        private val onPendingStatusClick: (MedicationListItem) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
 
         private val nameTextView = itemView.findViewById<TextView>(R.id.medicationName)
@@ -45,6 +47,9 @@ class MedicationListAdapter(
                     MedicationLogStatus.PENDING, null -> R.string.med_status_pending
                 }
             )
+            statusChip.setOnClickListener {
+                if (item.todayStatus == MedicationLogStatus.PENDING) onPendingStatusClick(item)
+            }
         }
     }
 

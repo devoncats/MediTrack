@@ -17,11 +17,14 @@ interface MedicationRepository {
     suspend fun updateSchedule(schedule: Schedule)
     suspend fun deleteSchedule(schedule: Schedule)
     suspend fun getSchedulesByMedication(medicationId: Long): List<Schedule>
+    suspend fun getScheduleById(id: Long): Schedule?
     fun observeSchedulesByMedication(medicationId: Long): LiveData<List<Schedule>>
 
     suspend fun insertLog(log: MedicationLog): Long
     suspend fun updateLog(log: MedicationLog)
     suspend fun deleteLog(log: MedicationLog)
+    suspend fun getLogById(id: Long): MedicationLog?
+    suspend fun getLatestPendingLogForMedication(medicationId: Long): MedicationLog?
     fun observeLogsByMedication(medicationId: Long): LiveData<List<MedicationLog>>
     fun observeLogsByOwnerBetween(ownerUserId: Long, startInclusive: Long, endExclusive: Long): LiveData<List<MedicationLog>>
 }
