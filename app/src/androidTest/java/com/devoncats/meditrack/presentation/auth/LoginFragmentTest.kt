@@ -14,11 +14,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.devoncats.meditrack.MainActivity
 import com.devoncats.meditrack.R
 import com.devoncats.meditrack.data.local.MediTrackDatabase
+import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.UserRole
 import com.devoncats.meditrack.utils.PasswordHasher
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.not
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,6 +45,12 @@ class LoginFragmentTest {
                 caregiverId = null
             )
         )
+    }
+
+    @After
+    fun clearSessionCreatedByLogin() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        SessionManager(context).clearSession()
     }
 
     @Test

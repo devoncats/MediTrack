@@ -21,6 +21,9 @@
     <string name="register_error_invalid_email">Formato de correo inválido</string>
     <string name="register_error_email_taken">Este correo ya está registrado</string>
 
+    <!-- Sesion -->
+    <string name="logout_button">Cerrar sesión</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
     <string name="placeholder_med_list">Lista de medicamentos</string>
     <string name="placeholder_med_form">Formulario de medicamento</string>
