@@ -52,8 +52,18 @@
     <string name="med_form_validation_error">Completa nombre, dosis, frecuencia, al menos un día y un horario</string>
     <string name="med_form_save_button">Guardar</string>
 
+    <!-- Detalle de medicamento -->
+    <string name="med_detail_title">Detalle de medicamento</string>
+    <string name="med_detail_photo_content_description">Foto del medicamento</string>
+    <string name="med_detail_today_history_label">Historial de hoy</string>
+    <string name="med_detail_today_history_empty">Sin registros de toma para hoy</string>
+    <string name="med_detail_edit_button">Editar</string>
+    <string name="med_detail_delete_button">Eliminar medicamento</string>
+    <string name="med_detail_delete_confirm_title">Eliminar medicamento</string>
+    <string name="med_detail_delete_confirm_message">¿Seguro que deseas eliminar %1$s? Se cancelaran todas sus alarmas y no se podra deshacer.</string>
+    <string name="med_detail_delete_confirm_positive">Eliminar</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
-    <string name="placeholder_med_detail">Detalle de medicamento</string>
     <string name="placeholder_alert">Confirmar toma</string>
     <string name="placeholder_dashboard">Dashboard del cuidador</string>
     <string name="placeholder_senior_list">Lista de pacientes mayores</string>
