@@ -9,8 +9,19 @@
     <string name="login_register_link">¿No tienes cuenta? Regístrate</string>
     <string name="login_error_invalid_credentials">Correo o contraseña incorrectos</string>
 
+    <!-- Register -->
+    <string name="register_title">Crear cuenta</string>
+    <string name="register_name_hint">Nombre</string>
+    <string name="register_email_hint">Correo electrónico</string>
+    <string name="register_password_hint">Contraseña</string>
+    <string name="register_role_patient">Paciente</string>
+    <string name="register_role_caregiver">Cuidador</string>
+    <string name="register_button">Registrarme</string>
+    <string name="register_login_link">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="register_error_invalid_email">Formato de correo inválido</string>
+    <string name="register_error_email_taken">Este correo ya está registrado</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
-    <string name="placeholder_register">Registro</string>
     <string name="placeholder_med_list">Lista de medicamentos</string>
     <string name="placeholder_med_form">Formulario de medicamento</string>
     <string name="placeholder_med_detail">Detalle de medicamento</string>

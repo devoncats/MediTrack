@@ -33,7 +33,7 @@
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.devoncats.meditrack.presentation.auth.RegisterFragment"
-        android:label="@string/placeholder_register"
+        android:label="@string/register_title"
         tools:layout="@layout/fragment_register">
         <action
             android:id="@+id/action_register_to_login"
