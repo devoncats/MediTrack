@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/seniorMedicationThumbnail"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/med_detail_photo_content_description"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@android:drawable/ic_menu_gallery" />
+
+        <TextView
+            android:id="@+id/seniorMedicationName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@id/seniorMedicationStatusChip"
+            app:layout_constraintStart_toEndOf="@id/seniorMedicationThumbnail"
+            app:layout_constraintTop_toTopOf="@id/seniorMedicationThumbnail"
+            tools:text="Paracetamol" />
+
+        <TextView
+            android:id="@+id/seniorMedicationDose"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@id/seniorMedicationStatusChip"
+            app:layout_constraintStart_toStartOf="@id/seniorMedicationName"
+            app:layout_constraintTop_toBottomOf="@id/seniorMedicationName"
+            tools:text="500mg" />
+
+        <TextView
+            android:id="@+id/seniorMedicationSchedule"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@id/seniorMedicationStatusChip"
+            app:layout_constraintStart_toStartOf="@id/seniorMedicationName"
+            app:layout_constraintTop_toBottomOf="@id/seniorMedicationDose"
+            tools:text="08:00, 20:00" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/seniorMedicationStatusChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Pendiente" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
