@@ -32,8 +32,26 @@
     <string name="med_status_pending">Pendiente</string>
     <string name="med_status_missed">Omitido</string>
 
+    <!-- Formulario de medicamento (agregar) -->
+    <string name="med_form_title">Agregar medicamento</string>
+    <string name="med_form_name_hint">Nombre</string>
+    <string name="med_form_dose_hint">Dosis</string>
+    <string name="med_form_frequency_hint">Frecuencia (ej. Cada 8 horas)</string>
+    <string name="med_form_instructions_hint">Indicaciones (opcional)</string>
+    <string name="med_form_days_label">Días de la semana</string>
+    <string name="day_mon">Lun</string>
+    <string name="day_tue">Mar</string>
+    <string name="day_wed">Mié</string>
+    <string name="day_thu">Jue</string>
+    <string name="day_fri">Vie</string>
+    <string name="day_sat">Sáb</string>
+    <string name="day_sun">Dom</string>
+    <string name="med_form_times_label">Horarios de toma</string>
+    <string name="med_form_add_time">Agregar hora</string>
+    <string name="med_form_validation_error">Completa nombre, dosis, frecuencia, al menos un día y un horario</string>
+    <string name="med_form_save_button">Guardar</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
-    <string name="placeholder_med_form">Formulario de medicamento</string>
     <string name="placeholder_med_detail">Detalle de medicamento</string>
     <string name="placeholder_alert">Confirmar toma</string>
     <string name="placeholder_dashboard">Dashboard del cuidador</string>

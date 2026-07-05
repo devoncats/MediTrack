@@ -41,7 +41,7 @@
     <fragment
         android:id="@+id/seniorMedFormFragment"
         android:name="com.devoncats.meditrack.presentation.patient.MedFormFragment"
-        android:label="@string/placeholder_med_form"
+        android:label="@string/med_form_title"
         tools:layout="@layout/fragment_med_form">
         <argument
             android:name="seniorUserId"
