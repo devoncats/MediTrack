@@ -22,14 +22,17 @@ import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.UserRole
 import com.devoncats.meditrack.services.AlarmScheduler
+import com.devoncats.meditrack.services.FileStorageHelper
 import com.devoncats.meditrack.services.MedicationAlarmReceiver
 import com.devoncats.meditrack.utils.PasswordHasher
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class MedDetailFragmentTest {
@@ -133,5 +136,48 @@ class MedDetailFragmentTest {
 
     private fun assertNotNullPendingIntent(scheduleId: Long) {
         org.junit.Assert.assertNotNull(existingPendingIntent(scheduleId))
+    }
+
+    @Test
+    fun deletingMedicationWithPhoto_removesThePhotoFileFromDisk(): Unit = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val fileStorageHelper = FileStorageHelper(context)
+        val cameraDir = File(context.cacheDir, "camera").apply { mkdirs() }
+        val sourceFile = File(cameraDir, "test_source_photo.jpg").apply { writeBytes(byteArrayOf(1, 2, 3)) }
+        val photoUri = androidx.core.content.FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            sourceFile
+        )
+        val photoPath = fileStorageHelper.savePhoto(photoUri)
+
+        val medicationWithPhotoId = MediTrackDatabase.getInstance(context).medicationDao().insert(
+            MedicationEntity(
+                name = "Ibuprofeno con foto",
+                dose = "400mg",
+                frequency = "Cada 12 horas",
+                instructions = null,
+                ownerUserId = userId,
+                photoUri = photoPath,
+                createdAt = System.currentTimeMillis()
+            )
+        )
+
+        assertTrue("photo file should exist before deleting the medication", File(context.filesDir, photoPath).exists())
+
+        ActivityScenario.launch(MainActivity::class.java).use {
+            onView(withText("Ibuprofeno con foto")).perform(click())
+
+            onView(withId(R.id.deleteButton)).perform(click())
+            onView(withText(R.string.med_detail_delete_confirm_positive)).perform(click())
+
+            Thread.sleep(500)
+        }
+
+        assertNull(MediTrackDatabase.getInstance(context).medicationDao().findById(medicationWithPhotoId))
+        assertFalse(
+            "photo file should be deleted along with the medication (no orphan photos)",
+            File(context.filesDir, photoPath).exists()
+        )
     }
 }

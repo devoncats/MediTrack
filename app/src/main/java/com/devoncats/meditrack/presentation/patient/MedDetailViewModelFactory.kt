@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.data.repository.MedicationRepositoryImpl
 import com.devoncats.meditrack.services.AlarmScheduler
+import com.devoncats.meditrack.services.FileStorageHelper
 
 class MedDetailViewModelFactory(context: Context, private val medicationId: Long) : ViewModelProvider.Factory {
 
@@ -16,8 +17,9 @@ class MedDetailViewModelFactory(context: Context, private val medicationId: Long
         MediTrackDatabase.getInstance(appContext).medicationLogDao()
     )
     private val alarmScheduler = AlarmScheduler(appContext)
+    private val fileStorageHelper = FileStorageHelper(appContext)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        MedDetailViewModel(medicationRepository, alarmScheduler, medicationId) as T
+        MedDetailViewModel(medicationRepository, alarmScheduler, fileStorageHelper, medicationId) as T
 }

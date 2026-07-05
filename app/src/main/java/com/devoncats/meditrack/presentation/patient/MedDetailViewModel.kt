@@ -9,12 +9,14 @@ import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.MedicationLog
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.services.AlarmScheduler
+import com.devoncats.meditrack.services.FileStorageHelper
 import com.devoncats.meditrack.utils.DateUtils
 import kotlinx.coroutines.launch
 
 class MedDetailViewModel(
     private val medicationRepository: MedicationRepository,
     private val alarmScheduler: AlarmScheduler,
+    private val fileStorageHelper: FileStorageHelper,
     private val medicationId: Long
 ) : ViewModel() {
 
@@ -37,6 +39,7 @@ class MedDetailViewModel(
                 alarmScheduler.cancel(schedule.id)
             }
             medicationRepository.deleteMedication(medication)
+            medication.photoUri?.takeIf { it.isNotBlank() }?.let { fileStorageHelper.deletePhoto(it) }
             _deleted.value = true
         }
     }
