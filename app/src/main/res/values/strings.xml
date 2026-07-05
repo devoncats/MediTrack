@@ -7,6 +7,15 @@
     <string name="notification_medication_alarm_text">Dosis: %1$s</string>
     <string name="notification_missed_dose_title">%1$s no confirmó su toma</string>
     <string name="notification_missed_dose_text">Se omitió la toma de %1$s</string>
+
+    <!-- Crear Paciente Mayor -->
+    <string name="create_senior_title">Agregar paciente mayor</string>
+    <string name="create_senior_description">Genera un usuario y PIN para que tu paciente mayor pueda iniciar sesión.</string>
+    <string name="create_senior_name_hint">Nombre del paciente mayor</string>
+    <string name="create_senior_generate_button">Generar credenciales</string>
+    <string name="create_senior_dialog_title">Credenciales generadas</string>
+    <string name="create_senior_dialog_message">Usuario: %1$s\nPIN: %2$s\n\nAnota estas credenciales ahora: no volverán a mostrarse.</string>
+    <string name="create_senior_dialog_positive">Entendido</string>
     <string name="notification_action_confirm">Confirmar toma</string>
     <string name="notification_action_postpone">Posponer 15 min</string>
 

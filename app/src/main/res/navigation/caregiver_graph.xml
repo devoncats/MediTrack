@@ -13,7 +13,16 @@
         <action
             android:id="@+id/action_dashboard_to_seniorList"
             app:destination="@id/seniorListFragment" />
+        <action
+            android:id="@+id/action_dashboard_to_createSeniorPatient"
+            app:destination="@id/createSeniorPatientFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/createSeniorPatientFragment"
+        android:name="com.devoncats.meditrack.presentation.caregiver.CreateSeniorPatientFragment"
+        android:label="@string/create_senior_title"
+        tools:layout="@layout/fragment_create_senior_patient" />
 
     <fragment
         android:id="@+id/seniorListFragment"
