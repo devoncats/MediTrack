@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
 import com.devoncats.meditrack.presentation.camera.CameraFragment
+import com.devoncats.meditrack.services.FileStorageHelper
 import com.devoncats.meditrack.utils.toCode
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
@@ -147,7 +148,8 @@ class MedFormFragment : Fragment(R.layout.fragment_med_form) {
                 frequency = frequencyEditText.text.toString().trim(),
                 instructions = instructionsEditText.text.toString().trim(),
                 selectedDays = selectedDays(),
-                selectedTimes = selectedTimes.toList()
+                selectedTimes = selectedTimes.toList(),
+                capturedPhotoUri = capturedPhotoUri
             )
         }
 
@@ -173,6 +175,15 @@ class MedFormFragment : Fragment(R.layout.fragment_med_form) {
             selectedTimes.clear()
             selectedTimes.addAll(prefill.times)
             renderTimeChips()
+
+            if (capturedPhotoUri == null && !prefill.photoUri.isNullOrBlank()) {
+                val bitmap = FileStorageHelper(requireContext()).loadPhoto(prefill.photoUri)
+                if (bitmap != null) {
+                    photoPreviewImageView.setImageBitmap(bitmap)
+                    photoPreviewImageView.visibility = View.VISIBLE
+                    takePhotoButton.setText(R.string.med_form_retake_photo_button)
+                }
+            }
 
             updateSaveButtonState()
         }

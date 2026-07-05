@@ -1,5 +1,6 @@
 package com.devoncats.meditrack.presentation.patient
 
+import android.Manifest
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.closeSoftKeyboard
 import androidx.test.espresso.Espresso.onView
@@ -25,9 +26,12 @@ import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.not
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class MedFormFragmentTest {
@@ -125,6 +129,53 @@ class MedFormFragmentTest {
             val schedules = MediTrackDatabase.getInstance(context).scheduleDao().getByMedication(medication!!.id)
             assertEquals(1, schedules.size)
             assertEquals("MON,WED", schedules[0].daysOfWeek)
+        }
+    }
+
+    @Test
+    fun addingMedicationWithPhoto_persistsThePhotoToStorage() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        InstrumentationRegistry.getInstrumentation().uiAutomation
+            .grantRuntimePermission(context.packageName, Manifest.permission.CAMERA)
+
+        ActivityScenario.launch(MainActivity::class.java).use {
+            goToMedForm()
+
+            onView(withId(R.id.nameEditText)).perform(typeText("Amoxicilina"))
+            onView(withId(R.id.doseEditText)).perform(typeText("250mg"))
+            onView(withId(R.id.frequencyEditText)).perform(typeText("Cada 8 horas"))
+            closeSoftKeyboard()
+            Thread.sleep(300)
+
+            onView(withId(R.id.takePhotoButton)).perform(click())
+            Thread.sleep(1500)
+            onView(withId(R.id.captureButton)).perform(click())
+            Thread.sleep(2000)
+
+            onView(withId(R.id.photoPreviewImageView)).check(matches(isDisplayed()))
+
+            onView(withId(R.id.chipMonday)).perform(click())
+            Thread.sleep(300)
+            onView(withId(R.id.addTimeButton)).perform(click())
+            onView(withId(MaterialR.id.material_timepicker_ok_button)).perform(click())
+            Thread.sleep(500)
+
+            onView(withId(R.id.saveButton)).perform(androidx.test.espresso.action.ViewActions.scrollTo(), click())
+            Thread.sleep(1000)
+
+            onView(withId(R.id.medListTitle)).check(matches(isDisplayed()))
+        }
+
+        runBlocking {
+            val medication = MediTrackDatabase.getInstance(context).medicationDao()
+                .observeByOwner(userId).getOrAwaitValue()
+                ?.first { it.name == "Amoxicilina" }
+            val photoUri = medication?.photoUri
+            assertNotNull("saved medication should have a photoUri", photoUri)
+            assertTrue(
+                "photo file referenced by photoUri should exist on disk",
+                File(context.filesDir, photoUri!!).exists()
+            )
         }
     }
 }
