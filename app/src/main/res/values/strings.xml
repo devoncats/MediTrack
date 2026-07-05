@@ -12,6 +12,8 @@
     <string name="create_senior_title">Agregar paciente mayor</string>
     <string name="create_senior_description">Genera un usuario y PIN para que tu paciente mayor pueda iniciar sesión.</string>
     <string name="create_senior_name_hint">Nombre del paciente mayor</string>
+    <string name="create_senior_contact_name_hint">Nombre del contacto de emergencia (opcional)</string>
+    <string name="create_senior_contact_phone_hint">Teléfono del contacto de emergencia (opcional)</string>
     <string name="create_senior_generate_button">Generar credenciales</string>
     <string name="create_senior_dialog_title">Credenciales generadas</string>
     <string name="create_senior_dialog_message">Usuario: %1$s\nPIN: %2$s\n\nAnota estas credenciales ahora: no volverán a mostrarse.</string>
@@ -106,11 +108,28 @@
     <!-- Detalle de paciente mayor -->
     <string name="senior_detail_medications_empty">Este paciente mayor aún no tiene medicamentos registrados. Toca el botón + para agregar el primero.</string>
     <string name="senior_detail_add_medication_content_description">Agregar medicamento</string>
+    <string name="senior_detail_contact_label">Contacto de emergencia</string>
+    <string name="senior_detail_contact_missing">Sin contacto registrado</string>
+    <string name="senior_detail_contact_format">%1$s · %2$s</string>
+    <string name="senior_detail_contact_edit_button">Editar</string>
+
+    <!-- Editar contacto de emergencia -->
+    <string name="emergency_contact_dialog_title">Contacto de emergencia</string>
+    <string name="emergency_contact_name_hint">Nombre</string>
+    <string name="emergency_contact_phone_hint">Teléfono</string>
+    <string name="emergency_contact_save_button">Guardar</string>
 
     <string name="dashboard_title">Dashboard del cuidador</string>
 
+    <!-- Alerta de toma omitida -->
+    <string name="missed_dose_alert_title">Alerta de toma omitida</string>
+    <string name="missed_dose_alert_medication_label">Medicamento omitido</string>
+    <string name="missed_dose_alert_scheduled_time_label">Hora programada</string>
+    <string name="missed_dose_alert_call_button">Llamar contacto de emergencia</string>
+    <string name="missed_dose_alert_dismiss_button">Descartar</string>
+    <string name="missed_dose_alert_no_contact_message">Este paciente mayor no tiene un contacto de emergencia registrado.</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
-    <string name="placeholder_missed_dose_alert">Alerta de toma perdida</string>
     <string name="placeholder_senior_med_list">Mis medicamentos</string>
     <string name="placeholder_senior_alert">Confirmar toma</string>
 </resources>

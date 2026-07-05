@@ -16,16 +16,61 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Rosa Martinez" />
 
+    <TextView
+        android:id="@+id/emergencyContactLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="@string/senior_detail_contact_label"
+        android:textAppearance="?attr/textAppearanceLabelMedium"
+        app:layout_constraintEnd_toStartOf="@id/editEmergencyContactButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/seniorDetailTitle" />
+
+    <TextView
+        android:id="@+id/emergencyContactInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/senior_detail_contact_missing"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        app:layout_constraintEnd_toStartOf="@id/editEmergencyContactButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/emergencyContactLabel" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/editEmergencyContactButton"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="@string/senior_detail_contact_edit_button"
+        app:layout_constraintBottom_toBottomOf="@id/emergencyContactInfo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/emergencyContactLabel" />
+
+    <View
+        android:id="@+id/emergencyContactDivider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="?attr/colorOutlineVariant"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/emergencyContactInfo" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/medicationRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
+        android:paddingTop="8dp"
         android:paddingBottom="88dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/seniorDetailTitle"
+        app:layout_constraintTop_toBottomOf="@id/emergencyContactDivider"
         tools:listitem="@layout/item_medication" />
 
     <TextView
@@ -40,7 +85,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/seniorDetailTitle" />
+        app:layout_constraintTop_toBottomOf="@id/emergencyContactDivider" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addMedicationFab"

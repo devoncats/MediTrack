@@ -20,6 +20,7 @@ import com.devoncats.meditrack.R
 import com.devoncats.meditrack.clearSessionAndDeleteUsers
 import com.devoncats.meditrack.seedCaregiverAndLogIn
 import com.devoncats.meditrack.data.local.MediTrackDatabase
+import com.devoncats.meditrack.data.local.entity.EmergencyContactEntity
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.UserRole
 import com.devoncats.meditrack.getOrAwaitValue
@@ -205,5 +206,63 @@ class SeniorDetailFragmentTest {
         val remaining = medicationDao.observeByOwner(seniorId).getOrAwaitValue()
             ?.firstOrNull { it.name == "Aspirina" }
         assertNull("deleted medication should no longer exist", remaining)
+    }
+
+    @Test
+    fun emergencyContact_showsMissingMessage_thenEditingSavesNewContact(): Unit = runBlocking {
+        ActivityScenario.launch(MainActivity::class.java).use {
+            goToSeniorDetail()
+
+            onView(withId(R.id.emergencyContactInfo))
+                .check(matches(withText(R.string.senior_detail_contact_missing)))
+
+            onView(withId(R.id.editEmergencyContactButton)).perform(click())
+            onView(withId(R.id.emergencyContactNameEditText)).perform(typeText("Hija de Rosa"))
+            onView(withId(R.id.emergencyContactPhoneEditText)).perform(typeText("3011112222"))
+            onView(withText(R.string.emergency_contact_save_button)).perform(click())
+
+            Thread.sleep(500)
+
+            onView(withId(R.id.emergencyContactInfo))
+                .check(matches(withText("Hija de Rosa · 3011112222")))
+        }
+
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val contact = MediTrackDatabase.getInstance(context).emergencyContactDao().findByUserId(seniorId)
+        assertNotNull("emergency contact should be saved for the senior", contact)
+        assertEquals("Hija de Rosa", contact!!.name)
+        assertEquals("3011112222", contact.phone)
+    }
+
+    @Test
+    fun emergencyContact_editingExistingContact_updatesItInPlace(): Unit = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        MediTrackDatabase.getInstance(context).emergencyContactDao().insert(
+            EmergencyContactEntity(
+                userId = seniorId,
+                name = "Contacto Original",
+                phone = "3000000000"
+            )
+        )
+
+        ActivityScenario.launch(MainActivity::class.java).use {
+            goToSeniorDetail()
+
+            onView(withId(R.id.emergencyContactInfo))
+                .check(matches(withText("Contacto Original · 3000000000")))
+
+            onView(withId(R.id.editEmergencyContactButton)).perform(click())
+            onView(withId(R.id.emergencyContactPhoneEditText)).perform(clearText(), typeText("3022223333"))
+            onView(withText(R.string.emergency_contact_save_button)).perform(click())
+
+            Thread.sleep(500)
+
+            onView(withId(R.id.emergencyContactInfo))
+                .check(matches(withText("Contacto Original · 3022223333")))
+        }
+
+        val contact = MediTrackDatabase.getInstance(context).emergencyContactDao().findByUserId(seniorId)
+        assertNotNull(contact)
+        assertEquals("3022223333", contact!!.phone)
     }
 }

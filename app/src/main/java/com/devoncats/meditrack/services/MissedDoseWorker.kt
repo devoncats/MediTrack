@@ -27,6 +27,7 @@ class MissedDoseWorker(context: Context, params: WorkerParameters) : CoroutineWo
             // notification to the caregiver's own device, so this simulates that cross-alert
             // as a local notification on this same device.
             NotificationHelper(applicationContext).showMissedDoseCaregiverNotification(
+                logId = log.id,
                 medicationId = medicationId,
                 seniorName = owner.name,
                 medicationName = medication.name
