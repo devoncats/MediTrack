@@ -1,12 +1,29 @@
 package com.devoncats.meditrack.services
 
+import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
+import androidx.core.content.ContextCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.devoncats.meditrack.data.local.MediTrackDatabase
+import com.devoncats.meditrack.data.local.entity.MedicationEntity
+import com.devoncats.meditrack.data.local.entity.ScheduleEntity
+import com.devoncats.meditrack.data.local.entity.UserEntity
+import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.utils.PasswordHasher
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNotNull
+import org.junit.Assume
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -45,5 +62,104 @@ class AlarmSchedulerTest {
         alarmScheduler.cancel(scheduleId)
 
         assertNull(existingPendingIntent(scheduleId))
+    }
+
+    @Test
+    fun rescheduleAll_reprogramsEveryScheduleFoundInRoom(): Unit = runBlocking {
+        val userDao = MediTrackDatabase.getInstance(context).userDao()
+        val email = "alarm-reschedule-test@meditrack.com"
+        userDao.findByEmail(email)?.let { userDao.delete(it) }
+        val userId = userDao.insert(
+            UserEntity(
+                name = "Reschedule Test User",
+                email = email,
+                passwordHash = PasswordHasher.hash("whatever123"),
+                role = UserRole.PATIENT,
+                caregiverId = null
+            )
+        )
+        val medicationDao = MediTrackDatabase.getInstance(context).medicationDao()
+        val medicationId = medicationDao.insert(
+            MedicationEntity(
+                name = "Test Med",
+                dose = "1",
+                frequency = "diaria",
+                instructions = null,
+                ownerUserId = userId,
+                photoUri = null,
+                createdAt = System.currentTimeMillis()
+            )
+        )
+        val scheduleDao = MediTrackDatabase.getInstance(context).scheduleDao()
+        val scheduleId1 = scheduleDao.insert(
+            ScheduleEntity(medicationId = medicationId, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        )
+        val scheduleId2 = scheduleDao.insert(
+            ScheduleEntity(medicationId = medicationId, time = "20:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        )
+
+        // Simulate the alarms having been cleared, e.g. by a device reboot.
+        alarmScheduler.cancel(scheduleId1)
+        alarmScheduler.cancel(scheduleId2)
+        assertNull(existingPendingIntent(scheduleId1))
+        assertNull(existingPendingIntent(scheduleId2))
+
+        alarmScheduler.rescheduleAll()
+
+        assertNotNull(existingPendingIntent(scheduleId1))
+        assertNotNull(existingPendingIntent(scheduleId2))
+
+        alarmScheduler.cancel(scheduleId1)
+        alarmScheduler.cancel(scheduleId2)
+    }
+
+    @Test
+    fun exactAlarm_firesWithinRnf01ToleranceOf30Seconds() {
+        // Verifies the same platform mechanism AlarmScheduler.schedule() relies on
+        // (AlarmManager.setExactAndAllowWhileIdle with RTC_WAKEUP) actually fires close
+        // to the requested time on this device/API level (RNF-01).
+        val action = "com.devoncats.meditrack.test.ALARM_FIRED"
+        val latch = CountDownLatch(1)
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        // On API 31+ this special permission must be granted out-of-band (e.g. via
+        // `adb shell appops set <pkg> SCHEDULE_EXACT_ALARM allow`) and does not survive
+        // a fresh install, which happens on every connectedAndroidTest run. Skip rather
+        // than fail when it isn't granted; AlarmScheduler itself already falls back to a
+        // non-exact set() in that case (see schedule()).
+        Assume.assumeTrue(
+            "exact alarm permission not granted in this environment",
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()
+        )
+
+        var firedAtMillis = 0L
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(receiverContext: Context, intent: Intent) {
+                firedAtMillis = System.currentTimeMillis()
+                latch.countDown()
+            }
+        }
+        val filter = IntentFilter(action)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            ContextCompat.registerReceiver(context, receiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+        }
+
+        try {
+            val targetMillis = System.currentTimeMillis() + 3_000
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                4_099,
+                Intent(action).setPackage(context.packageName),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, targetMillis, pendingIntent)
+
+            assertTrue("alarm did not fire in time", latch.await(15, TimeUnit.SECONDS))
+            val deltaSeconds = abs(firedAtMillis - targetMillis) / 1000.0
+            assertTrue("expected margin < 30s, was ${deltaSeconds}s", deltaSeconds < 30)
+        } finally {
+            context.unregisterReceiver(receiver)
+        }
     }
 }
