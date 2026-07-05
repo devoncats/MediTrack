@@ -1,5 +1,6 @@
 package com.devoncats.meditrack.presentation.patient
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -24,8 +25,12 @@ class MedFormFragment : Fragment(R.layout.fragment_med_form) {
     private val medicationId: Long
         get() = arguments?.getLong("medicationId", MedFormViewModel.NEW_MEDICATION_ID) ?: MedFormViewModel.NEW_MEDICATION_ID
 
+    private val seniorUserId: Long
+        get() = arguments?.getLong("seniorUserId", MedFormViewModelFactory.NO_SENIOR_USER_ID)
+            ?: MedFormViewModelFactory.NO_SENIOR_USER_ID
+
     private val viewModel: MedFormViewModel by viewModels {
-        MedFormViewModelFactory(requireContext(), medicationId)
+        MedFormViewModelFactory(requireContext(), medicationId, seniorUserId)
     }
 
     private val selectedTimes = sortedSetOf<LocalTime>()
@@ -80,6 +85,7 @@ class MedFormFragment : Fragment(R.layout.fragment_med_form) {
         frequencyEditText.addTextChangedListener(fieldsWatcher)
         daysOfWeekChipGroup.setOnCheckedStateChangeListener { _, _ -> updateSaveButtonState() }
 
+        @SuppressLint("SetTextI18n")
         fun renderTimeChips() {
             timesChipGroup.removeAllViews()
             selectedTimes.forEach { time ->

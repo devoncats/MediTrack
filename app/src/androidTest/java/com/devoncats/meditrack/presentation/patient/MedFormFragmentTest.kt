@@ -76,6 +76,7 @@ class MedFormFragmentTest {
             onView(withId(R.id.doseEditText)).perform(typeText("500mg"))
             onView(withId(R.id.frequencyEditText)).perform(typeText("Cada 8 horas"))
             closeSoftKeyboard()
+            Thread.sleep(300)
             onView(withId(R.id.saveButton)).check(matches(not(isEnabled())))
 
             onView(withId(R.id.chipMonday)).perform(click())
@@ -98,6 +99,7 @@ class MedFormFragmentTest {
             onView(withId(R.id.doseEditText)).perform(typeText("400mg"))
             onView(withId(R.id.frequencyEditText)).perform(typeText("Cada 12 horas"))
             closeSoftKeyboard()
+            Thread.sleep(300)
             onView(withId(R.id.chipMonday)).perform(click())
             onView(withId(R.id.chipWednesday)).perform(click())
             onView(withId(R.id.addTimeButton)).perform(click())
