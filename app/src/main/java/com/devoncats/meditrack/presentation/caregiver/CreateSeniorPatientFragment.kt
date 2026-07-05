@@ -22,6 +22,8 @@ class CreateSeniorPatientFragment : Fragment(R.layout.fragment_create_senior_pat
         super.onViewCreated(view, savedInstanceState)
 
         val nameEditText = view.findViewById<TextInputEditText>(R.id.nameEditText)
+        val contactNameEditText = view.findViewById<TextInputEditText>(R.id.contactNameEditText)
+        val contactPhoneEditText = view.findViewById<TextInputEditText>(R.id.contactPhoneEditText)
         val generateButton = view.findViewById<MaterialButton>(R.id.generateButton)
 
         nameEditText.addTextChangedListener(object : TextWatcher {
@@ -33,7 +35,11 @@ class CreateSeniorPatientFragment : Fragment(R.layout.fragment_create_senior_pat
         })
 
         generateButton.setOnClickListener {
-            viewModel.createSeniorPatient(nameEditText.text.toString().trim())
+            viewModel.createSeniorPatient(
+                nameEditText.text.toString().trim(),
+                contactNameEditText.text.toString().trim(),
+                contactPhoneEditText.text.toString().trim()
+            )
         }
 
         viewModel.result.observe(viewLifecycleOwner) { result ->

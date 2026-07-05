@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.devoncats.meditrack.domain.model.EmergencyContact
 import com.devoncats.meditrack.domain.model.User
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.domain.repository.EmergencyContactRepository
 import com.devoncats.meditrack.domain.repository.UserRepository
 import com.devoncats.meditrack.utils.PasswordHasher
 import kotlin.random.Random
@@ -20,13 +22,14 @@ sealed class CreateSeniorPatientResult {
 
 class CreateSeniorPatientViewModel(
     private val userRepository: UserRepository,
+    private val emergencyContactRepository: EmergencyContactRepository,
     private val caregiverId: Long
 ) : ViewModel() {
 
     private val _result = MutableLiveData<CreateSeniorPatientResult>()
     val result: LiveData<CreateSeniorPatientResult> = _result
 
-    fun createSeniorPatient(name: String) {
+    fun createSeniorPatient(name: String, contactName: String, contactPhone: String) {
         if (name.isBlank()) {
             _result.value = CreateSeniorPatientResult.ValidationError
             return
@@ -36,7 +39,7 @@ class CreateSeniorPatientViewModel(
             val username = uniqueUsername(name)
             val pin = generatePin()
 
-            userRepository.insert(
+            val seniorId = userRepository.insert(
                 User(
                     id = 0,
                     name = name.trim(),
@@ -46,6 +49,17 @@ class CreateSeniorPatientViewModel(
                     caregiverId = caregiverId
                 )
             )
+
+            if (contactPhone.isNotBlank()) {
+                emergencyContactRepository.insert(
+                    EmergencyContact(
+                        id = 0,
+                        userId = seniorId,
+                        name = contactName.trim().ifBlank { name.trim() },
+                        phone = contactPhone.trim()
+                    )
+                )
+            }
 
             _result.value = CreateSeniorPatientResult.Success(GeneratedCredentials(username, pin))
         }

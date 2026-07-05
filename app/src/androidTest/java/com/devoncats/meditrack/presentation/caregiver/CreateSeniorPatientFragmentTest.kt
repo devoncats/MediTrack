@@ -117,4 +117,36 @@ class CreateSeniorPatientFragmentTest {
             }
         }
     }
+
+    @Test
+    fun createSeniorPatient_withEmergencyContact_savesContactLinkedToSenior() {
+        val capture = CaptureText()
+
+        ActivityScenario.launch(MainActivity::class.java).use {
+            onView(withId(R.id.addSeniorPatientButton)).perform(click())
+
+            onView(withId(R.id.nameEditText)).perform(typeText(seniorName))
+            onView(withId(R.id.contactNameEditText)).perform(typeText("Hijo de Rosa"))
+            onView(withId(R.id.contactPhoneEditText)).perform(typeText("3009876543"))
+            onView(withId(R.id.generateButton)).perform(click())
+
+            Thread.sleep(500)
+
+            onView(withId(android.R.id.message)).perform(capture)
+            val username = Regex("Usuario: (\\S+)").find(capture.text.orEmpty())?.groupValues?.get(1)
+                ?: error("username not found in dialog message")
+
+            val context = InstrumentationRegistry.getInstrumentation().targetContext
+            runBlocking {
+                val senior = MediTrackDatabase.getInstance(context).userDao().findByEmail(username)!!
+                val contact = MediTrackDatabase.getInstance(context).emergencyContactDao().findByUserId(senior.id)
+                assertNotNull("emergency contact should be saved for the new senior", contact)
+                assertEquals("Hijo de Rosa", contact!!.name)
+                assertEquals("3009876543", contact.phone)
+
+                SessionManager(context).clearSession()
+                MediTrackDatabase.getInstance(context).userDao().delete(senior)
+            }
+        }
+    }
 }

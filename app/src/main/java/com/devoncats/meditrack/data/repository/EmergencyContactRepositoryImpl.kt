@@ -12,6 +12,9 @@ class EmergencyContactRepositoryImpl(
     override suspend fun insert(contact: EmergencyContact): Long =
         emergencyContactDao.insert(contact.toEntity())
 
+    override suspend fun update(contact: EmergencyContact) =
+        emergencyContactDao.update(contact.toEntity())
+
     override suspend fun findByUserId(userId: Long): EmergencyContact? =
         emergencyContactDao.findByUserId(userId)?.toDomain()
 
