@@ -50,6 +50,8 @@
         android:minHeight="56dp"
         android:text="@string/senior_alert_confirm_button"
         android:textSize="20sp"
+        app:icon="@drawable/ic_lucide_check_circle"
+        app:iconGravity="textStart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

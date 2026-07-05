@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Accessibility: every text style used across the app is at least 16sp, per RNF-03 and
+        the elderly-focused audience. Hierarchy is preserved via font weight/family instead of
+        shrinking text below 16sp.
+    -->
+    <style name="TextAppearance.MediTrack.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+    </style>
+
+    <style name="TextAppearance.MediTrack.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+    </style>
+
+    <style name="TextAppearance.MediTrack.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.MediTrack.LabelMedium" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.MediTrack.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.MediTrack.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Buttons: Material3's default 40dp height is below the 48dp minimum touch target. -->
+    <style name="Widget.MediTrack.Button" parent="Widget.Material3.Button">
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="Widget.MediTrack.Button.OutlinedButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <!--
+        Chips: keep the compact visual size but expand the actual hit area to 48dp via
+        chipMinTouchTargetSize, Material's built-in mechanism for this (no visual bloat).
+    -->
+    <style name="Widget.MediTrack.Chip.Standalone" parent="Widget.Material3.Chip.Input">
+        <item name="chipMinTouchTargetSize">48dp</item>
+    </style>
+
+    <style name="Widget.MediTrack.Chip.Assist" parent="Widget.Material3.Chip.Assist">
+        <item name="chipMinTouchTargetSize">48dp</item>
+    </style>
+
+</resources>

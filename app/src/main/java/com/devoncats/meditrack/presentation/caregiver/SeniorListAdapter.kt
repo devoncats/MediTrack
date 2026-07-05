@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.devoncats.meditrack.R
-import com.devoncats.meditrack.domain.model.MedicationLogStatus
+import com.devoncats.meditrack.utils.StatusChipBinder
 import com.google.android.material.chip.Chip
 
 class SeniorListAdapter(
@@ -38,14 +38,7 @@ class SeniorListAdapter(
 
         fun bind(item: SeniorListItem) {
             nameTextView.text = item.senior.name
-            statusChip.setText(
-                when (item.todayStatus) {
-                    MedicationLogStatus.CONFIRMED -> R.string.med_status_confirmed
-                    MedicationLogStatus.PENDING -> R.string.med_status_pending
-                    MedicationLogStatus.MISSED -> R.string.med_status_missed
-                    null -> R.string.senior_status_no_doses_today
-                }
-            )
+            StatusChipBinder.bind(statusChip, item.todayStatus, noDosesTextRes = R.string.senior_status_no_doses_today)
             itemView.setOnClickListener { onItemClick(item) }
             deleteButton.setOnClickListener { onDeleteClick(item) }
         }

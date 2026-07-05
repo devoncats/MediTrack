@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:contentDescription="@string/senior_list_add_content_description"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@drawable/ic_lucide_plus"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

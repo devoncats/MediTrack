@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Semantic status colors (medication log status): dark-mode variants. -->
+    <color name="status_pending_container">#78350F</color>
+    <color name="status_pending_on_container">#FEF3C7</color>
+    <color name="status_confirmed_container">#14532D</color>
+    <color name="status_confirmed_on_container">#DCFCE7</color>
+    <color name="status_missed_container">#B91C1C</color>
+    <color name="status_missed_on_container">#FEE2E2</color>
+</resources>

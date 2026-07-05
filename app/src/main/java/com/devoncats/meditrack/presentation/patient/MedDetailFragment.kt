@@ -64,7 +64,7 @@ class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
             if (photoBitmap != null) {
                 photoImageView.setImageBitmap(photoBitmap)
             } else {
-                photoImageView.setImageResource(android.R.drawable.ic_menu_gallery)
+                photoImageView.setImageResource(R.drawable.ic_lucide_image)
             }
 
             editButton.setOnClickListener {

@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:text="@string/logout_button"
+        app:icon="@drawable/ic_lucide_log_out"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -58,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:contentDescription="@string/med_list_add_content_description"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@drawable/ic_lucide_plus"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

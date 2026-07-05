@@ -20,7 +20,7 @@
             android:scaleType="centerCrop"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@android:drawable/ic_menu_gallery" />
+            tools:src="@drawable/ic_lucide_image" />
 
         <TextView
             android:id="@+id/seniorMedicationName"
