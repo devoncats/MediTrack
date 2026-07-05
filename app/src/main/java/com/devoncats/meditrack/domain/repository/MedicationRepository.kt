@@ -5,6 +5,7 @@ import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.MedicationLog
 import com.devoncats.meditrack.domain.model.MissedDoseAlert
 import com.devoncats.meditrack.domain.model.Schedule
+import com.devoncats.meditrack.domain.model.SeniorDoseStatus
 
 interface MedicationRepository {
     suspend fun insertMedication(medication: Medication): Long
@@ -29,4 +30,9 @@ interface MedicationRepository {
     fun observeLogsByMedication(medicationId: Long): LiveData<List<MedicationLog>>
     fun observeLogsByOwnerBetween(ownerUserId: Long, startInclusive: Long, endExclusive: Long): LiveData<List<MedicationLog>>
     fun observeMissedDoseAlertsForCaregiver(caregiverId: Long): LiveData<List<MissedDoseAlert>>
+    fun observeTodayLogStatusesForCaregiverSeniors(
+        caregiverId: Long,
+        startInclusive: Long,
+        endExclusive: Long
+    ): LiveData<List<SeniorDoseStatus>>
 }

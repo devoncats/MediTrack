@@ -73,11 +73,14 @@
     <fragment
         android:id="@+id/seniorListFragment"
         android:name="com.devoncats.meditrack.presentation.caregiver.SeniorListFragment"
-        android:label="@string/placeholder_senior_list"
+        android:label="@string/senior_list_title"
         tools:layout="@layout/fragment_senior_list">
         <action
             android:id="@+id/action_seniorList_to_seniorDetail"
             app:destination="@id/seniorDetailFragment" />
+        <action
+            android:id="@+id/action_seniorList_to_createSeniorPatient"
+            app:destination="@id/createSeniorPatientFragment" />
     </fragment>
 
     <fragment

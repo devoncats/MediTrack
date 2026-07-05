@@ -12,6 +12,7 @@ import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.MedicationLog
 import com.devoncats.meditrack.domain.model.MissedDoseAlert
 import com.devoncats.meditrack.domain.model.Schedule
+import com.devoncats.meditrack.domain.model.SeniorDoseStatus
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 
 class MedicationRepositoryImpl(
@@ -93,6 +94,14 @@ class MedicationRepositoryImpl(
                 )
             }
         }
+
+    override fun observeTodayLogStatusesForCaregiverSeniors(
+        caregiverId: Long,
+        startInclusive: Long,
+        endExclusive: Long
+    ): LiveData<List<SeniorDoseStatus>> =
+        medicationLogDao.observeTodayLogStatusesForCaregiverSeniors(caregiverId, startInclusive, endExclusive)
+            .map { rows -> rows.map { SeniorDoseStatus(it.seniorId, it.status) } }
 
     private fun MedicationEntity.toDomain() = Medication(
         id = id,

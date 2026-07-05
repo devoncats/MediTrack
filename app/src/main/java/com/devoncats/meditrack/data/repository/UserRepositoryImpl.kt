@@ -1,5 +1,7 @@
 package com.devoncats.meditrack.data.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import com.devoncats.meditrack.data.local.dao.UserDao
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.User
@@ -18,6 +20,9 @@ class UserRepositoryImpl(private val userDao: UserDao) : UserRepository {
 
     override suspend fun delete(user: User) =
         userDao.delete(user.toEntity())
+
+    override fun observeSeniorPatientsByCaregiver(caregiverId: Long): LiveData<List<User>> =
+        userDao.observeByCaregiverId(caregiverId).map { list -> list.map { it.toDomain() } }
 
     private fun UserEntity.toDomain() = User(
         id = id,

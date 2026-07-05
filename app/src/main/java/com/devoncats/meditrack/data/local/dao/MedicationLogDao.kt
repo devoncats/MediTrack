@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.devoncats.meditrack.data.local.entity.MedicationLogEntity
+import com.devoncats.meditrack.domain.model.MedicationLogStatus
 
 @Dao
 interface MedicationLogDao {
@@ -60,6 +61,24 @@ interface MedicationLogDao {
         """
     )
     fun observeMissedDoseAlertsForCaregiver(caregiverId: Long): LiveData<List<MissedDoseAlertRow>>
+
+    @Query(
+        """
+        SELECT users.id AS seniorId, medication_logs.status AS status
+        FROM medication_logs
+        INNER JOIN medications ON medications.id = medication_logs.medicationId
+        INNER JOIN users ON users.id = medications.ownerUserId
+        WHERE users.caregiverId = :caregiverId
+          AND users.role = 'SENIOR_PATIENT'
+          AND medication_logs.scheduledDatetime >= :startInclusive
+          AND medication_logs.scheduledDatetime < :endExclusive
+        """
+    )
+    fun observeTodayLogStatusesForCaregiverSeniors(
+        caregiverId: Long,
+        startInclusive: Long,
+        endExclusive: Long
+    ): LiveData<List<SeniorTodayLogRow>>
 }
 
 data class MissedDoseAlertRow(
@@ -67,4 +86,9 @@ data class MissedDoseAlertRow(
     val seniorName: String,
     val medicationName: String,
     val scheduledDatetime: Long
+)
+
+data class SeniorTodayLogRow(
+    val seniorId: Long,
+    val status: MedicationLogStatus
 )
