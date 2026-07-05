@@ -25,6 +25,16 @@ class AlarmScheduler(private val context: Context) {
         }
     }
 
+    fun postpone(scheduleId: Long, medicationId: Long, minutes: Long = POSTPONE_MINUTES, now: LocalDateTime = LocalDateTime.now()) {
+        val triggerAtMillis = postponeTriggerMillis(now, minutes)
+        val pendingIntent = pendingIntentFor(scheduleId, medicationId)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+        }
+    }
+
     suspend fun rescheduleAll() {
         val scheduleDao = MediTrackDatabase.getInstance(context).scheduleDao()
         scheduleDao.getAll().forEach { schedule ->
@@ -59,6 +69,10 @@ class AlarmScheduler(private val context: Context) {
     companion object {
         const val EXTRA_SCHEDULE_ID = "scheduleId"
         const val EXTRA_MEDICATION_ID = "medicationId"
+        const val POSTPONE_MINUTES = 15L
+
+        internal fun postponeTriggerMillis(now: LocalDateTime, minutes: Long): Long =
+            now.plusMinutes(minutes).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
         internal fun nextTriggerMillis(time: String, daysOfWeek: String, now: LocalDateTime): Long? {
             val localTime = runCatching { LocalTime.parse(time) }.getOrNull() ?: return null

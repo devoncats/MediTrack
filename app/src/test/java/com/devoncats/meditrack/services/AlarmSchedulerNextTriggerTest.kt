@@ -43,4 +43,13 @@ class AlarmSchedulerNextTriggerTest {
     fun `returns null when no valid days are provided`() {
         assertNull(AlarmScheduler.nextTriggerMillis("08:00", "", LocalDateTime.now()))
     }
+
+    @Test
+    fun `postponeTriggerMillis adds the given number of minutes to now`() {
+        val now = LocalDateTime.of(2026, 7, 6, 8, 0)
+        val result = AlarmScheduler.postponeTriggerMillis(now, 15)
+
+        val expected = LocalDateTime.of(2026, 7, 6, 8, 15)
+        assertEquals(expected.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli(), result)
+    }
 }

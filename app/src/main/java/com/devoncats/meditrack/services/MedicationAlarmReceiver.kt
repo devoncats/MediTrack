@@ -33,6 +33,7 @@ class MedicationAlarmReceiver : BroadcastReceiver() {
                     NotificationHelper(context).showMedicationAlarmNotification(
                         logId = logId,
                         scheduleId = scheduleId,
+                        medicationId = medicationId,
                         medicationName = medication.name,
                         dose = medication.dose
                     )
