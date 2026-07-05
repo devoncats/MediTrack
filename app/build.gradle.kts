@@ -62,6 +62,7 @@ dependencies {
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
+    androidTestImplementation(libs.androidx.work.testing)
 
     // CameraX
     implementation(libs.androidx.camera.core)

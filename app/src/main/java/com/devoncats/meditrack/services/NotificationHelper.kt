@@ -52,6 +52,29 @@ class NotificationHelper(private val context: Context) {
         NotificationManagerCompat.from(context).notify(logId.toInt(), notification)
     }
 
+    fun showMissedDoseCaregiverNotification(medicationId: Long, seniorName: String, medicationName: String) {
+        createChannelIfNeeded()
+
+        val contentIntent = PendingIntent.getActivity(
+            context,
+            0,
+            context.packageManager.getLaunchIntentForPackage(context.packageName),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setContentTitle(context.getString(R.string.notification_missed_dose_title, seniorName))
+            .setContentText(context.getString(R.string.notification_missed_dose_text, medicationName))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setAutoCancel(true)
+            .setContentIntent(contentIntent)
+            .build()
+
+        NotificationManagerCompat.from(context).notify(MISSED_DOSE_NOTIFICATION_ID_OFFSET + medicationId.toInt(), notification)
+    }
+
     private fun confirmActionPendingIntent(logId: Long): PendingIntent {
         val intent = Intent(context, MedicationActionReceiver::class.java).apply {
             action = MedicationActionReceiver.ACTION_CONFIRM
@@ -92,5 +115,6 @@ class NotificationHelper(private val context: Context) {
 
     companion object {
         const val CHANNEL_ID = "medication_reminders"
+        private const val MISSED_DOSE_NOTIFICATION_ID_OFFSET = 1_000_000
     }
 }

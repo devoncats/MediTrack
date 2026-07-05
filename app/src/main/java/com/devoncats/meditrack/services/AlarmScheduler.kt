@@ -5,15 +5,21 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.utils.toDayOfWeekOrNull
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import java.util.concurrent.TimeUnit
 
 class AlarmScheduler(private val context: Context) {
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    private val workManager by lazy { WorkManager.getInstance(context) }
 
     fun schedule(scheduleId: Long, medicationId: Long, time: String, daysOfWeek: String, now: LocalDateTime = LocalDateTime.now()) {
         val triggerAtMillis = nextTriggerMillis(time, daysOfWeek, now) ?: return
@@ -23,6 +29,7 @@ class AlarmScheduler(private val context: Context) {
         } else {
             alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
         }
+        enqueueMissedDoseCheck(scheduleId, medicationId, triggerAtMillis)
     }
 
     fun postpone(scheduleId: Long, medicationId: Long, minutes: Long = POSTPONE_MINUTES, now: LocalDateTime = LocalDateTime.now()) {
@@ -33,6 +40,7 @@ class AlarmScheduler(private val context: Context) {
         } else {
             alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
         }
+        enqueueMissedDoseCheck(scheduleId, medicationId, triggerAtMillis)
     }
 
     suspend fun rescheduleAll() {
@@ -51,6 +59,17 @@ class AlarmScheduler(private val context: Context) {
         )
         alarmManager.cancel(pendingIntent)
         pendingIntent.cancel()
+        workManager.cancelUniqueWork(missedDoseWorkName(scheduleId))
+    }
+
+    private fun enqueueMissedDoseCheck(scheduleId: Long, medicationId: Long, triggerAtMillis: Long) {
+        val delayMillis = (triggerAtMillis - System.currentTimeMillis()) +
+            TimeUnit.MINUTES.toMillis(MISSED_DOSE_CHECK_DELAY_MINUTES)
+        val request = OneTimeWorkRequestBuilder<MissedDoseWorker>()
+            .setInitialDelay(delayMillis.coerceAtLeast(0), TimeUnit.MILLISECONDS)
+            .setInputData(workDataOf(MissedDoseWorker.KEY_MEDICATION_ID to medicationId))
+            .build()
+        workManager.enqueueUniqueWork(missedDoseWorkName(scheduleId), ExistingWorkPolicy.REPLACE, request)
     }
 
     private fun pendingIntentFor(scheduleId: Long, medicationId: Long): PendingIntent {
@@ -70,6 +89,9 @@ class AlarmScheduler(private val context: Context) {
         const val EXTRA_SCHEDULE_ID = "scheduleId"
         const val EXTRA_MEDICATION_ID = "medicationId"
         const val POSTPONE_MINUTES = 15L
+        const val MISSED_DOSE_CHECK_DELAY_MINUTES = 30L
+
+        internal fun missedDoseWorkName(scheduleId: Long) = "missed_dose_check_$scheduleId"
 
         internal fun postponeTriggerMillis(now: LocalDateTime, minutes: Long): Long =
             now.plusMinutes(minutes).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
