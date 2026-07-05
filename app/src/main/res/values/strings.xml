@@ -87,6 +87,12 @@
     <string name="alert_postpone_button">Posponer 15 min</string>
     <string name="alert_dismiss_button">Omitir</string>
 
+    <!-- Dashboard del cuidador -->
+    <string name="dashboard_seniors_section_title">Pacientes mayores</string>
+    <string name="dashboard_view_seniors_button">Ver pacientes mayores</string>
+    <string name="dashboard_missed_doses_section_title">Alertas de tomas omitidas</string>
+    <string name="dashboard_missed_doses_empty">No hay tomas omitidas pendientes de revisión</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
     <string name="placeholder_dashboard">Dashboard del cuidador</string>
     <string name="placeholder_senior_list">Lista de pacientes mayores</string>

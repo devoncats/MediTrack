@@ -3,6 +3,7 @@ package com.devoncats.meditrack.domain.repository
 import androidx.lifecycle.LiveData
 import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.MedicationLog
+import com.devoncats.meditrack.domain.model.MissedDoseAlert
 import com.devoncats.meditrack.domain.model.Schedule
 
 interface MedicationRepository {
@@ -27,4 +28,5 @@ interface MedicationRepository {
     suspend fun getLatestPendingLogForMedication(medicationId: Long): MedicationLog?
     fun observeLogsByMedication(medicationId: Long): LiveData<List<MedicationLog>>
     fun observeLogsByOwnerBetween(ownerUserId: Long, startInclusive: Long, endExclusive: Long): LiveData<List<MedicationLog>>
+    fun observeMissedDoseAlertsForCaregiver(caregiverId: Long): LiveData<List<MissedDoseAlert>>
 }

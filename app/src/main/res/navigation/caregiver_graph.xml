@@ -16,6 +16,52 @@
         <action
             android:id="@+id/action_dashboard_to_createSeniorPatient"
             app:destination="@id/createSeniorPatientFragment" />
+        <action
+            android:id="@+id/action_dashboard_to_medForm"
+            app:destination="@id/ownMedFormFragment" />
+        <action
+            android:id="@+id/action_dashboard_to_medDetail"
+            app:destination="@id/ownMedDetailFragment" />
+        <action
+            android:id="@+id/action_dashboard_to_alert"
+            app:destination="@id/ownAlertFragment" />
+        <action
+            android:id="@+id/action_dashboard_to_missedDoseAlert"
+            app:destination="@id/missedDoseAlertFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ownMedFormFragment"
+        android:name="com.devoncats.meditrack.presentation.patient.MedFormFragment"
+        android:label="@string/med_form_title"
+        tools:layout="@layout/fragment_med_form">
+        <argument
+            android:name="medicationId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ownMedDetailFragment"
+        android:name="com.devoncats.meditrack.presentation.patient.MedDetailFragment"
+        android:label="@string/med_detail_title"
+        tools:layout="@layout/fragment_med_detail">
+        <argument
+            android:name="medicationId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_medDetail_to_medForm"
+            app:destination="@id/ownMedFormFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ownAlertFragment"
+        android:name="com.devoncats.meditrack.presentation.patient.AlertFragment"
+        android:label="@string/alert_title"
+        tools:layout="@layout/fragment_alert">
+        <argument
+            android:name="scheduleId"
+            app:argType="long" />
     </fragment>
 
     <fragment
