@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
 import com.devoncats.meditrack.domain.model.MedicationLog
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
+import com.devoncats.meditrack.services.FileStorageHelper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import java.time.Instant
@@ -32,6 +33,8 @@ class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
     private val viewModel: MedDetailViewModel by viewModels {
         MedDetailViewModelFactory(requireContext(), medicationId)
     }
+
+    private val fileStorageHelper by lazy { FileStorageHelper(requireContext()) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,7 +60,12 @@ class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
                 instructionsTextView.text = medication.instructions
                 instructionsTextView.visibility = View.VISIBLE
             }
-            photoImageView.visibility = if (medication.photoUri.isNullOrBlank()) View.GONE else View.VISIBLE
+            val photoBitmap = medication.photoUri?.takeIf { it.isNotBlank() }?.let { fileStorageHelper.loadPhoto(it) }
+            if (photoBitmap != null) {
+                photoImageView.setImageBitmap(photoBitmap)
+            } else {
+                photoImageView.setImageResource(android.R.drawable.ic_menu_gallery)
+            }
 
             editButton.setOnClickListener {
                 val args = bundleOf("medicationId" to medication.id)

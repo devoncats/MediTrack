@@ -2,8 +2,14 @@ package com.devoncats.meditrack.presentation.patient
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.view.View
+import android.widget.ImageView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.NoMatchingViewException
+import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -26,7 +32,9 @@ import com.devoncats.meditrack.services.FileStorageHelper
 import com.devoncats.meditrack.services.MedicationAlarmReceiver
 import com.devoncats.meditrack.utils.PasswordHasher
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -179,5 +187,71 @@ class MedDetailFragmentTest {
             "photo file should be deleted along with the medication (no orphan photos)",
             File(context.filesDir, photoPath).exists()
         )
+    }
+
+    private fun savePhotoOfSize(context: android.content.Context, size: Int): String {
+        val cameraDir = File(context.cacheDir, "camera").apply { mkdirs() }
+        val sourceFile = File(cameraDir, "source_${System.nanoTime()}.jpg")
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        sourceFile.outputStream().use { bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it) }
+        val uri = androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", sourceFile)
+        return FileStorageHelper(context).savePhoto(uri)
+    }
+
+    private class DrawableIsPlaceholder : ViewAssertion {
+        override fun check(view: View?, noViewFoundException: NoMatchingViewException?) {
+            if (noViewFoundException != null) throw noViewFoundException
+            val imageView = view as ImageView
+            val placeholder = androidx.core.content.ContextCompat.getDrawable(
+                imageView.context,
+                android.R.drawable.ic_menu_gallery
+            )
+            assertEquals(
+                "expected the placeholder icon to be set",
+                placeholder?.constantState,
+                imageView.drawable.constantState
+            )
+        }
+    }
+
+    private class DrawableHasSize(private val expectedSize: Int) : ViewAssertion {
+        override fun check(view: View?, noViewFoundException: NoMatchingViewException?) {
+            if (noViewFoundException != null) throw noViewFoundException
+            val bitmap = ((view as ImageView).drawable as? BitmapDrawable)?.bitmap
+            assertNotNull("expected a photo bitmap to be set", bitmap)
+            assertTrue(bitmap!!.width == expectedSize && bitmap.height == expectedSize)
+        }
+    }
+
+    @Test
+    fun detail_showsPlaceholder_whenMedicationHasNoPhoto() {
+        ActivityScenario.launch(MainActivity::class.java).use {
+            onView(withText("Paracetamol")).perform(click())
+
+            onView(withId(R.id.medicationPhoto)).check(DrawableIsPlaceholder())
+        }
+    }
+
+    @Test
+    fun detail_showsActualPhoto_whenMedicationHasOne(): Unit = runBlocking {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val photoPath = savePhotoOfSize(context, 30)
+        MediTrackDatabase.getInstance(context).medicationDao().insert(
+            MedicationEntity(
+                name = "Ibuprofeno con foto detalle",
+                dose = "400mg",
+                frequency = "Cada 12 horas",
+                instructions = null,
+                ownerUserId = userId,
+                photoUri = photoPath,
+                createdAt = System.currentTimeMillis()
+            )
+        )
+
+        ActivityScenario.launch(MainActivity::class.java).use {
+            onView(withText("Ibuprofeno con foto detalle")).perform(click())
+
+            onView(withId(R.id.medicationPhoto)).check(DrawableHasSize(30))
+        }
     }
 }
