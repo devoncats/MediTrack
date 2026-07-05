@@ -32,7 +32,7 @@
     <fragment
         android:id="@+id/medDetailFragment"
         android:name="com.devoncats.meditrack.presentation.patient.MedDetailFragment"
-        android:label="@string/placeholder_med_detail"
+        android:label="@string/med_detail_title"
         tools:layout="@layout/fragment_med_detail">
         <argument
             android:name="medicationId"
