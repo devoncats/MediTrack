@@ -128,7 +128,9 @@ class DashboardFragmentTest {
         ActivityScenario.launch(MainActivity::class.java).use {
             onView(withText(seniorMedicationName)).perform(click())
 
-            onView(withText(R.string.placeholder_missed_dose_alert)).check(matches(isDisplayed()))
+            Thread.sleep(500)
+
+            onView(withId(R.id.missedDoseAlertTitle)).check(matches(isDisplayed()))
         }
     }
 }

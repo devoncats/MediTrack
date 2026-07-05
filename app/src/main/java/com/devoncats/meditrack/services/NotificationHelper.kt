@@ -1,11 +1,12 @@
 package com.devoncats.meditrack.services
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.os.bundleOf
@@ -14,6 +15,7 @@ import com.devoncats.meditrack.R
 
 class NotificationHelper(private val context: Context) {
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun showMedicationAlarmNotification(
         logId: Long,
         scheduleId: Long,
@@ -52,15 +54,15 @@ class NotificationHelper(private val context: Context) {
         NotificationManagerCompat.from(context).notify(logId.toInt(), notification)
     }
 
-    fun showMissedDoseCaregiverNotification(medicationId: Long, seniorName: String, medicationName: String) {
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    fun showMissedDoseCaregiverNotification(logId: Long, medicationId: Long, seniorName: String, medicationName: String) {
         createChannelIfNeeded()
 
-        val contentIntent = PendingIntent.getActivity(
-            context,
-            0,
-            context.packageManager.getLaunchIntentForPackage(context.packageName),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val contentIntent = NavDeepLinkBuilder(context)
+            .setGraph(R.navigation.main_nav_graph)
+            .setDestination(R.id.missedDoseAlertFragment)
+            .setArguments(bundleOf("logId" to logId))
+            .createPendingIntent()
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
@@ -104,7 +106,6 @@ class NotificationHelper(private val context: Context) {
     }
 
     private fun createChannelIfNeeded() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
             CHANNEL_ID,
             context.getString(R.string.notification_channel_name),

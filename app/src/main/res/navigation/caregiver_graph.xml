@@ -135,7 +135,7 @@
     <fragment
         android:id="@+id/missedDoseAlertFragment"
         android:name="com.devoncats.meditrack.presentation.caregiver.MissedDoseAlertFragment"
-        android:label="@string/placeholder_missed_dose_alert"
+        android:label="@string/missed_dose_alert_title"
         tools:layout="@layout/fragment_missed_dose_alert">
         <argument
             android:name="logId"
