@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/seniorMedListFragment"
         android:name="com.devoncats.meditrack.presentation.senior.SeniorMedListFragment"
-        android:label="@string/placeholder_senior_med_list"
+        android:label="@string/senior_med_list_title"
         tools:layout="@layout/fragment_senior_med_list" />
 
     <fragment
