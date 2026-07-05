@@ -17,8 +17,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.devoncats.meditrack.MainActivity
 import com.devoncats.meditrack.R
+import com.devoncats.meditrack.clearSessionAndDeleteUsers
+import com.devoncats.meditrack.seedCaregiverAndLogIn
 import com.devoncats.meditrack.data.local.MediTrackDatabase
-import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.UserRole
 import com.devoncats.meditrack.getOrAwaitValue
@@ -46,21 +47,12 @@ class SeniorDetailFragmentTest {
 
     @Before
     fun seedCaregiverAndSenior(): Unit = runBlocking {
+        caregiverId = seedCaregiverAndLogIn(caregiverEmail)
+
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val userDao = MediTrackDatabase.getInstance(context).userDao()
 
-        userDao.findByEmail(caregiverEmail)?.let { userDao.delete(it) }
         userDao.findByEmail(seniorEmail)?.let { userDao.delete(it) }
-
-        caregiverId = userDao.insert(
-            UserEntity(
-                name = "Caregiver Test",
-                email = caregiverEmail,
-                passwordHash = PasswordHasher.hash("CaregiverPass123!"),
-                role = UserRole.CAREGIVER,
-                caregiverId = null
-            )
-        )
         seniorId = userDao.insert(
             UserEntity(
                 name = seniorName,
@@ -70,17 +62,11 @@ class SeniorDetailFragmentTest {
                 caregiverId = caregiverId
             )
         )
-
-        SessionManager(context).saveSession(caregiverId, UserRole.CAREGIVER.name)
     }
 
     @After
     fun cleanUp(): Unit = runBlocking {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        SessionManager(context).clearSession()
-        val userDao = MediTrackDatabase.getInstance(context).userDao()
-        userDao.findByEmail(seniorEmail)?.let { userDao.delete(it) }
-        userDao.findByEmail(caregiverEmail)?.let { userDao.delete(it) }
+        clearSessionAndDeleteUsers(seniorEmail, caregiverEmail)
     }
 
     private fun goToSeniorDetail() {

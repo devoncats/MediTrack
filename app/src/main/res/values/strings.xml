@@ -107,8 +107,9 @@
     <string name="senior_detail_medications_empty">Este paciente mayor aún no tiene medicamentos registrados. Toca el botón + para agregar el primero.</string>
     <string name="senior_detail_add_medication_content_description">Agregar medicamento</string>
 
+    <string name="dashboard_title">Dashboard del cuidador</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
-    <string name="placeholder_dashboard">Dashboard del cuidador</string>
     <string name="placeholder_missed_dose_alert">Alerta de toma perdida</string>
     <string name="placeholder_senior_med_list">Mis medicamentos</string>
     <string name="placeholder_senior_alert">Confirmar toma</string>

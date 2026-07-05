@@ -11,8 +11,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.devoncats.meditrack.MainActivity
 import com.devoncats.meditrack.R
+import com.devoncats.meditrack.clearSessionAndDeleteUsers
+import com.devoncats.meditrack.seedCaregiverAndLogIn
 import com.devoncats.meditrack.data.local.MediTrackDatabase
-import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.data.local.entity.MedicationEntity
 import com.devoncats.meditrack.data.local.entity.MedicationLogEntity
 import com.devoncats.meditrack.data.local.entity.ScheduleEntity
@@ -47,31 +48,12 @@ class SeniorListFragmentTest {
 
     @Before
     fun seedCaregiverAndSession(): Unit = runBlocking {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val userDao = MediTrackDatabase.getInstance(context).userDao()
-
-        userDao.findByEmail(caregiverEmail)?.let { userDao.delete(it) }
-        caregiverId = userDao.insert(
-            UserEntity(
-                name = "Caregiver Test",
-                email = caregiverEmail,
-                passwordHash = PasswordHasher.hash("CaregiverPass123!"),
-                role = UserRole.CAREGIVER,
-                caregiverId = null
-            )
-        )
-
-        SessionManager(context).saveSession(caregiverId, UserRole.CAREGIVER.name)
+        caregiverId = seedCaregiverAndLogIn(caregiverEmail)
     }
 
     @After
     fun cleanUp(): Unit = runBlocking {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        SessionManager(context).clearSession()
-        val userDao = MediTrackDatabase.getInstance(context).userDao()
-        listOf(caregiverEmail, seniorMissedEmail, seniorNoLogsEmail).forEach { email ->
-            userDao.findByEmail(email)?.let { userDao.delete(it) }
-        }
+        clearSessionAndDeleteUsers(caregiverEmail, seniorMissedEmail, seniorNoLogsEmail)
     }
 
     private fun findTextRecursively(view: View, text: String): Boolean {
