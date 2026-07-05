@@ -1,5 +1,6 @@
 package com.devoncats.meditrack.data.local.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -20,4 +21,7 @@ interface UserDao {
 
     @Delete
     suspend fun delete(user: UserEntity)
+
+    @Query("SELECT * FROM users WHERE caregiverId = :caregiverId AND role = 'SENIOR_PATIENT' ORDER BY name ASC")
+    fun observeByCaregiverId(caregiverId: Long): LiveData<List<UserEntity>>
 }

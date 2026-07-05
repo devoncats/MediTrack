@@ -123,7 +123,7 @@ class DashboardFragmentTest {
         ActivityScenario.launch(MainActivity::class.java).use {
             onView(withId(R.id.viewSeniorsButton)).perform(click())
 
-            onView(withText(R.string.placeholder_senior_list)).check(matches(isDisplayed()))
+            onView(withId(R.id.seniorListTitle)).check(matches(isDisplayed()))
         }
     }
 

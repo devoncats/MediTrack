@@ -78,7 +78,7 @@
     <string name="med_detail_edit_button">Editar</string>
     <string name="med_detail_delete_button">Eliminar medicamento</string>
     <string name="med_detail_delete_confirm_title">Eliminar medicamento</string>
-    <string name="med_detail_delete_confirm_message">¿Seguro que deseas eliminar %1$s? Se cancelaran todas sus alarmas y no se podra deshacer.</string>
+    <string name="med_detail_delete_confirm_message">¿Seguro que deseas eliminar %1$s? Se cancelarán todas sus alarmas y no se podra deshacer.</string>
     <string name="med_detail_delete_confirm_positive">Eliminar</string>
 
     <!-- Alerta de confirmacion de toma -->
@@ -93,9 +93,18 @@
     <string name="dashboard_missed_doses_section_title">Alertas de tomas omitidas</string>
     <string name="dashboard_missed_doses_empty">No hay tomas omitidas pendientes de revisión</string>
 
+    <!-- Lista de pacientes mayores -->
+    <string name="senior_list_title">Mis pacientes mayores</string>
+    <string name="senior_list_empty_message">Aún no tienes pacientes mayores registrados. Toca el botón + para agregar el primero.</string>
+    <string name="senior_list_add_content_description">Agregar paciente mayor</string>
+    <string name="senior_status_no_doses_today">Sin registros hoy</string>
+    <string name="senior_delete_content_description">Eliminar paciente mayor</string>
+    <string name="senior_delete_confirm_title">Eliminar paciente mayor</string>
+    <string name="senior_delete_confirm_message">¿Seguro que deseas eliminar a %1$s? Se eliminarán también sus medicamentos, horarios, registros y credenciales. Esta acción no se puede deshacer.</string>
+    <string name="senior_delete_confirm_positive">Eliminar</string>
+
     <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
     <string name="placeholder_dashboard">Dashboard del cuidador</string>
-    <string name="placeholder_senior_list">Lista de pacientes mayores</string>
     <string name="placeholder_senior_detail">Detalle de paciente mayor</string>
     <string name="placeholder_missed_dose_alert">Alerta de toma perdida</string>
     <string name="placeholder_senior_med_list">Mis medicamentos</string>
