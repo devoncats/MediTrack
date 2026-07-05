@@ -80,6 +80,7 @@ class MedFormFragmentTest {
             onView(withId(R.id.saveButton)).check(matches(not(isEnabled())))
 
             onView(withId(R.id.chipMonday)).perform(click())
+            Thread.sleep(300)
             onView(withId(R.id.saveButton)).check(matches(not(isEnabled())))
 
             onView(withId(R.id.addTimeButton)).perform(click())

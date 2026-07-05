@@ -89,6 +89,38 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
+            android:id="@+id/photoLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/med_form_photo_label"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/instructionsInputLayout" />
+
+        <ImageView
+            android:id="@+id/photoPreviewImageView"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/med_detail_photo_content_description"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/photoLabel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/takePhotoButton"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/med_form_take_photo_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/photoPreviewImageView" />
+
+        <TextView
             android:id="@+id/daysOfWeekLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -97,7 +129,7 @@
             android:textAppearance="?attr/textAppearanceLabelLarge"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/instructionsInputLayout" />
+            app:layout_constraintTop_toBottomOf="@id/takePhotoButton" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/daysOfWeekChipGroup"
@@ -118,7 +150,6 @@
                 android:text="@string/day_mon" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chipTuesday"
                 style="?attr/chipStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -136,7 +167,6 @@
                 android:text="@string/day_wed" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chipThursday"
                 style="?attr/chipStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -145,7 +175,6 @@
                 android:text="@string/day_thu" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chipFriday"
                 style="?attr/chipStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -154,7 +183,6 @@
                 android:text="@string/day_fri" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chipSaturday"
                 style="?attr/chipStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -163,7 +191,6 @@
                 android:text="@string/day_sat" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/chipSunday"
                 style="?attr/chipStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

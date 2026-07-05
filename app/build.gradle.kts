@@ -30,6 +30,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    testOptions {
+        animationsDisabled = true
+    }
 }
 
 ksp {
@@ -45,6 +49,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.espresso.intents)
+    androidTestImplementation(libs.androidx.uiautomator)
     androidTestImplementation(libs.androidx.junit)
 
     // Lifecycle
