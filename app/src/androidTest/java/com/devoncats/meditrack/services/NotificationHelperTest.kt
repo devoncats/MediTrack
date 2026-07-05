@@ -55,4 +55,29 @@ class NotificationHelperTest {
 
         notificationManager.cancel(logId.toInt())
     }
+
+    @Test
+    fun showMedicationAlarmNotification_forSeniorPatient_omitsPostponeAction() {
+        val logId = 9_002L
+        NotificationHelper(context).showMedicationAlarmNotification(
+            logId = logId,
+            scheduleId = 1L,
+            medicationId = 2L,
+            medicationName = "Ibuprofeno",
+            dose = "400mg",
+            isSeniorPatient = true
+        )
+
+        Thread.sleep(500)
+
+        val notificationManager = context.getSystemService(NotificationManager::class.java)
+        val posted = notificationManager.activeNotifications.first { it.id == logId.toInt() }.notification
+        assertEquals(1, posted.actions?.size)
+        assertEquals(
+            context.getString(R.string.notification_action_confirm),
+            posted.actions!![0].title.toString()
+        )
+
+        notificationManager.cancel(logId.toInt())
+    }
 }

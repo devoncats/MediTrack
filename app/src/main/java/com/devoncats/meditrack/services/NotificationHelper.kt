@@ -21,17 +21,18 @@ class NotificationHelper(private val context: Context) {
         scheduleId: Long,
         medicationId: Long,
         medicationName: String,
-        dose: String
+        dose: String,
+        isSeniorPatient: Boolean = false
     ) {
         createChannelIfNeeded()
 
         val contentIntent = NavDeepLinkBuilder(context)
             .setGraph(R.navigation.main_nav_graph)
-            .setDestination(R.id.alertFragment)
+            .setDestination(if (isSeniorPatient) R.id.seniorAlertFragment else R.id.alertFragment)
             .setArguments(bundleOf("scheduleId" to scheduleId))
             .createPendingIntent()
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle(context.getString(R.string.notification_medication_alarm_title, medicationName))
             .setContentText(context.getString(R.string.notification_medication_alarm_text, dose))
@@ -44,14 +45,16 @@ class NotificationHelper(private val context: Context) {
                 context.getString(R.string.notification_action_confirm),
                 confirmActionPendingIntent(logId)
             )
-            .addAction(
+
+        if (!isSeniorPatient) {
+            notificationBuilder.addAction(
                 android.R.drawable.ic_menu_recent_history,
                 context.getString(R.string.notification_action_postpone),
                 postponeActionPendingIntent(logId, scheduleId, medicationId)
             )
-            .build()
+        }
 
-        NotificationManagerCompat.from(context).notify(logId.toInt(), notification)
+        NotificationManagerCompat.from(context).notify(logId.toInt(), notificationBuilder.build())
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)

@@ -132,12 +132,13 @@
     <string name="missed_dose_alert_dismiss_button">Descartar</string>
     <string name="missed_dose_alert_no_contact_message">Este paciente mayor no tiene un contacto de emergencia registrado.</string>
 
-    <!-- Placeholders de navegacion, se reemplazan en cada issue de UI correspondiente -->
-    <string name="placeholder_senior_alert">Confirmar toma</string>
-
     <!-- Lista de medicamentos del Paciente Mayor (solo lectura) -->
     <string name="senior_med_list_title">Mis medicamentos</string>
     <string name="senior_med_list_empty_message">Aún no tienes medicamentos registrados. Tu cuidador puede agregarlos por ti.</string>
+
+    <!-- Confirmacion de toma del Paciente Mayor -->
+    <string name="senior_alert_title">Hora de tu medicamento</string>
+    <string name="senior_alert_confirm_button">Confirmar toma</string>
 
     <!-- Camara -->
     <string name="camera_title">Tomar foto</string>
