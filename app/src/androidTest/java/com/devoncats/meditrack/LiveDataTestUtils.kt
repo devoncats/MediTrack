@@ -18,5 +18,10 @@ fun <T> LiveData<T>.getOrAwaitValue(timeoutSeconds: Long = 5): T? {
     }
     InstrumentationRegistry.getInstrumentation().runOnMainSync { observeForever(observer) }
     latch.await(timeoutSeconds, TimeUnit.SECONDS)
+    // Room schedules its next invalidation-tracker refresh asynchronously right after this
+    // emission; without draining the main thread here, that refresh can still be in flight
+    // when @After closes the (in-memory) database, crashing the instrumented process on a
+    // background thread ("Exception while computing database live data" on a closed db).
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync()
     return result
 }
