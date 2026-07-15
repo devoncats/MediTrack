@@ -37,11 +37,11 @@ class MedicationAlarmReceiverTest {
         instrumentation.uiAutomation.grantRuntimePermission(context.packageName, "android.permission.POST_NOTIFICATIONS")
 
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        userDao.findByEmail(testEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(testEmail)?.let { userDao.delete(it) }
         val userId = userDao.insert(
             UserEntity(
                 name = "Alarm Receiver Test User",
-                email = testEmail,
+                username = testEmail,
                 passwordHash = PasswordHasher.hash("whatever123"),
                 role = UserRole.PATIENT,
                 caregiverId = null
@@ -102,11 +102,11 @@ class MedicationAlarmReceiverTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val seniorEmail = "alarm-receiver-senior-test@meditrack.com"
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        userDao.findByEmail(seniorEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(seniorEmail)?.let { userDao.delete(it) }
         val seniorId = userDao.insert(
             UserEntity(
                 name = "Alarm Receiver Senior Test",
-                email = seniorEmail,
+                username = seniorEmail,
                 passwordHash = PasswordHasher.hash("whatever123"),
                 role = UserRole.SENIOR_PATIENT,
                 caregiverId = null

@@ -53,11 +53,11 @@ class SeniorDetailFragmentTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val userDao = MediTrackDatabase.getInstance(context).userDao()
 
-        userDao.findByEmail(seniorEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(seniorEmail)?.let { userDao.delete(it) }
         seniorId = userDao.insert(
             UserEntity(
                 name = seniorName,
-                email = seniorEmail,
+                username = seniorEmail,
                 passwordHash = PasswordHasher.hash("123456"),
                 role = UserRole.SENIOR_PATIENT,
                 caregiverId = caregiverId

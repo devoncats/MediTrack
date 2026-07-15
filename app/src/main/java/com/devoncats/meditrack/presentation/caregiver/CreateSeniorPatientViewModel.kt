@@ -43,7 +43,7 @@ class CreateSeniorPatientViewModel(
                 User(
                     id = 0,
                     name = name.trim(),
-                    email = username,
+                    username = username,
                     passwordHash = PasswordHasher.hash(pin),
                     role = UserRole.SENIOR_PATIENT,
                     caregiverId = caregiverId
@@ -69,7 +69,7 @@ class CreateSeniorPatientViewModel(
         val base = buildUsername(name, caregiverId)
         var candidate = base
         var suffix = 1
-        while (userRepository.findByEmail(candidate) != null) {
+        while (userRepository.findByUsername(candidate) != null) {
             candidate = "${base}_$suffix"
             suffix++
         }

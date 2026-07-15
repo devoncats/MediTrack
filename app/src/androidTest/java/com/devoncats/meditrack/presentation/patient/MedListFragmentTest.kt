@@ -54,11 +54,11 @@ class MedListFragmentTest {
         sessionManager.clearSession()
 
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        userDao.findByEmail(testEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(testEmail)?.let { userDao.delete(it) }
         userId = userDao.insert(
             UserEntity(
                 name = "MedList Test User",
-                email = testEmail,
+                username = testEmail,
                 passwordHash = PasswordHasher.hash("whatever123"),
                 role = UserRole.PATIENT,
                 caregiverId = null

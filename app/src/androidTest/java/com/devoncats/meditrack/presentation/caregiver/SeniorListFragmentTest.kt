@@ -104,7 +104,7 @@ class SeniorListFragmentTest {
         val missedSeniorId = userDao.insert(
             UserEntity(
                 name = "Senior Missed Test",
-                email = seniorMissedEmail,
+                username = seniorMissedEmail,
                 passwordHash = PasswordHasher.hash("123456"),
                 role = UserRole.SENIOR_PATIENT,
                 caregiverId = caregiverId
@@ -113,7 +113,7 @@ class SeniorListFragmentTest {
         userDao.insert(
             UserEntity(
                 name = "Senior NoLogs Test",
-                email = seniorNoLogsEmail,
+                username = seniorNoLogsEmail,
                 passwordHash = PasswordHasher.hash("123456"),
                 role = UserRole.SENIOR_PATIENT,
                 caregiverId = caregiverId
@@ -183,7 +183,7 @@ class SeniorListFragmentTest {
         val seniorId = userDao.insert(
             UserEntity(
                 name = "Senior Delete Test",
-                email = seniorMissedEmail,
+                username = seniorMissedEmail,
                 passwordHash = PasswordHasher.hash("123456"),
                 role = UserRole.SENIOR_PATIENT,
                 caregiverId = caregiverId

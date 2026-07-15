@@ -85,7 +85,7 @@ class CreateSeniorPatientFragmentTest {
             val savedSenior = runBlocking {
                 MediTrackDatabase.getInstance(
                     InstrumentationRegistry.getInstrumentation().targetContext
-                ).userDao().findByEmail(username)
+                ).userDao().findByUsername(username)
             }
             assertNotNull(savedSenior)
             assertEquals(UserRole.SENIOR_PATIENT, savedSenior!!.role)
@@ -110,7 +110,7 @@ class CreateSeniorPatientFragmentTest {
 
             runBlocking {
                 val context = InstrumentationRegistry.getInstrumentation().targetContext
-                MediTrackDatabase.getInstance(context).userDao().findByEmail(username)?.let {
+                MediTrackDatabase.getInstance(context).userDao().findByUsername(username)?.let {
                     SessionManager(context).clearSession()
                     MediTrackDatabase.getInstance(context).userDao().delete(it)
                 }
@@ -138,7 +138,7 @@ class CreateSeniorPatientFragmentTest {
 
             val context = InstrumentationRegistry.getInstrumentation().targetContext
             runBlocking {
-                val senior = MediTrackDatabase.getInstance(context).userDao().findByEmail(username)!!
+                val senior = MediTrackDatabase.getInstance(context).userDao().findByUsername(username)!!
                 val contact = MediTrackDatabase.getInstance(context).emergencyContactDao().findByUserId(senior.id)
                 assertNotNull("emergency contact should be saved for the new senior", contact)
                 assertEquals("Hijo de Rosa", contact!!.name)

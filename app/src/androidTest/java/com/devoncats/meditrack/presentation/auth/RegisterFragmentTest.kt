@@ -37,12 +37,12 @@ class RegisterFragmentTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val userDao = MediTrackDatabase.getInstance(context).userDao()
         listOf(newPatientEmail, newCaregiverEmail, existingEmail).forEach { email ->
-            userDao.findByEmail(email)?.let { userDao.delete(it) }
+            userDao.findByUsername(email)?.let { userDao.delete(it) }
         }
         userDao.insert(
             UserEntity(
                 name = "Existing User",
-                email = existingEmail,
+                username = existingEmail,
                 passwordHash = PasswordHasher.hash("whatever123"),
                 role = UserRole.PATIENT,
                 caregiverId = null
@@ -88,7 +88,7 @@ class RegisterFragmentTest {
 
             runBlocking {
                 val context = InstrumentationRegistry.getInstrumentation().targetContext
-                val savedUser = MediTrackDatabase.getInstance(context).userDao().findByEmail(newPatientEmail)
+                val savedUser = MediTrackDatabase.getInstance(context).userDao().findByUsername(newPatientEmail)
                 assertNotNull(savedUser)
                 assertEquals(UserRole.PATIENT, savedUser!!.role)
             }
@@ -110,7 +110,7 @@ class RegisterFragmentTest {
 
             runBlocking {
                 val context = InstrumentationRegistry.getInstrumentation().targetContext
-                val savedUser = MediTrackDatabase.getInstance(context).userDao().findByEmail(newCaregiverEmail)
+                val savedUser = MediTrackDatabase.getInstance(context).userDao().findByUsername(newCaregiverEmail)
                 assertNotNull(savedUser)
                 assertEquals(UserRole.CAREGIVER, savedUser!!.role)
             }

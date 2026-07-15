@@ -69,12 +69,12 @@ class AlarmSchedulerTest {
     @Test
     fun rescheduleAll_reprogramsEveryScheduleFoundInRoom(): Unit = runBlocking {
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        val email = "alarm-reschedule-test@meditrack.com"
-        userDao.findByEmail(email)?.let { userDao.delete(it) }
+        val username = "alarm-reschedule-test@meditrack.com"
+        userDao.findByUsername(username)?.let { userDao.delete(it) }
         val userId = userDao.insert(
             UserEntity(
                 name = "Reschedule Test User",
-                email = email,
+                username = username,
                 passwordHash = PasswordHasher.hash("whatever123"),
                 role = UserRole.PATIENT,
                 caregiverId = null

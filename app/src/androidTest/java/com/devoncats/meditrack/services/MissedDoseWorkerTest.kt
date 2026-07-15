@@ -36,11 +36,11 @@ class MissedDoseWorkerTest {
 
     private suspend fun seedUserAndMedication(email: String, role: UserRole, name: String): Pair<Long, Long> {
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        userDao.findByEmail(email)?.let { userDao.delete(it) }
+        userDao.findByUsername(email)?.let { userDao.delete(it) }
         val userId = userDao.insert(
             UserEntity(
                 name = name,
-                email = email,
+                username = email,
                 passwordHash = PasswordHasher.hash("whatever123"),
                 role = role,
                 caregiverId = null

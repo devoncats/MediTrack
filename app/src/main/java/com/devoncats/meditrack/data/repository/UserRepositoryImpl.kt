@@ -12,8 +12,8 @@ class UserRepositoryImpl(private val userDao: UserDao) : UserRepository {
     override suspend fun insert(user: User): Long =
         userDao.insert(user.toEntity())
 
-    override suspend fun findByEmail(email: String): User? =
-        userDao.findByEmail(email)?.toDomain()
+    override suspend fun findByUsername(username: String): User? =
+        userDao.findByUsername(username)?.toDomain()
 
     override suspend fun findById(id: Long): User? =
         userDao.findById(id)?.toDomain()
@@ -27,7 +27,7 @@ class UserRepositoryImpl(private val userDao: UserDao) : UserRepository {
     private fun UserEntity.toDomain() = User(
         id = id,
         name = name,
-        email = email,
+        username = username,
         passwordHash = passwordHash,
         role = role,
         caregiverId = caregiverId
@@ -36,7 +36,7 @@ class UserRepositoryImpl(private val userDao: UserDao) : UserRepository {
     private fun User.toEntity() = UserEntity(
         id = id,
         name = name,
-        email = email,
+        username = username,
         passwordHash = passwordHash,
         role = role,
         caregiverId = caregiverId

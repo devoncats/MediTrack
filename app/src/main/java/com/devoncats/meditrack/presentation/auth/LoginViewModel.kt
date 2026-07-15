@@ -25,7 +25,7 @@ class LoginViewModel(
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            val user = userRepository.findByEmail(email)
+            val user = userRepository.findByUsername(email)
             if (user == null || !PasswordHasher.verify(password, user.passwordHash)) {
                 _loginResult.value = LoginResult.InvalidCredentials
                 return@launch

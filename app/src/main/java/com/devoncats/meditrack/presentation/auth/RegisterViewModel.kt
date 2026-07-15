@@ -28,7 +28,7 @@ class RegisterViewModel(private val userRepository: UserRepository) : ViewModel(
                 _registerResult.value = RegisterResult.InvalidEmailFormat
                 return@launch
             }
-            if (userRepository.findByEmail(email) != null) {
+            if (userRepository.findByUsername(email) != null) {
                 _registerResult.value = RegisterResult.EmailAlreadyRegistered
                 return@launch
             }
@@ -36,7 +36,7 @@ class RegisterViewModel(private val userRepository: UserRepository) : ViewModel(
                 User(
                     id = 0,
                     name = name,
-                    email = email,
+                    username = email,
                     passwordHash = PasswordHasher.hash(password),
                     role = role,
                     caregiverId = null

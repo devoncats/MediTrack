@@ -15,11 +15,11 @@ suspend fun seedCaregiverAndLogIn(
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     val userDao = MediTrackDatabase.getInstance(context).userDao()
 
-    userDao.findByEmail(email)?.let { userDao.delete(it) }
+    userDao.findByUsername(email)?.let { userDao.delete(it) }
     val caregiverId = userDao.insert(
         UserEntity(
             name = name,
-            email = email,
+            username = email,
             passwordHash = PasswordHasher.hash(password),
             role = UserRole.CAREGIVER,
             caregiverId = null
@@ -33,5 +33,5 @@ suspend fun clearSessionAndDeleteUsers(vararg emails: String) {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     SessionManager(context).clearSession()
     val userDao = MediTrackDatabase.getInstance(context).userDao()
-    emails.forEach { email -> userDao.findByEmail(email)?.let { userDao.delete(it) } }
+    emails.forEach { email -> userDao.findByUsername(email)?.let { userDao.delete(it) } }
 }

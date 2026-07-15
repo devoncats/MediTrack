@@ -26,7 +26,7 @@ import com.devoncats.meditrack.data.local.entity.UserEntity
         MedicationLogEntity::class,
         EmergencyContactEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 
@@ -52,6 +52,20 @@ abstract class MediTrackDatabase : RoomDatabase() {
             }
         }
 
+        // v2 -> v3: "email" never held a real email for SENIOR_PATIENT rows (it holds a
+        // synthetic username, see CreateSeniorPatientViewModel.buildUsername), so the column
+        // is renamed to match what it actually stores. The RENAME COLUMN alone would leave the
+        // unique index pointing at a column reference Room can resolve, but Room's schema
+        // validation checks the index *name* too (derived as index_users_<column>), so the old
+        // index must be dropped and recreated under the new name explicitly.
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE users RENAME COLUMN email TO username")
+                db.execSQL("DROP INDEX IF EXISTS index_users_email")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_users_username ON users(username)")
+            }
+        }
+
         @Volatile
         private var instance: MediTrackDatabase? = null
 
@@ -61,7 +75,7 @@ abstract class MediTrackDatabase : RoomDatabase() {
                     context.applicationContext,
                     MediTrackDatabase::class.java,
                     DATABASE_NAME
-                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
             }
     }
 }
