@@ -33,6 +33,9 @@ class MedicationRepositoryImpl(
     override suspend fun getMedicationById(id: Long): Medication? =
         medicationDao.findById(id)?.toDomain()
 
+    override suspend fun getMedicationsByOwner(ownerUserId: Long): List<Medication> =
+        medicationDao.getByOwner(ownerUserId).map { it.toDomain() }
+
     override fun observeMedicationsByOwner(ownerUserId: Long): LiveData<List<Medication>> =
         medicationDao.observeByOwner(ownerUserId).map { list -> list.map { it.toDomain() } }
 

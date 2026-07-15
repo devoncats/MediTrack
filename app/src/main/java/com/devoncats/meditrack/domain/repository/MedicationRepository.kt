@@ -12,6 +12,7 @@ interface MedicationRepository {
     suspend fun updateMedication(medication: Medication)
     suspend fun deleteMedication(medication: Medication)
     suspend fun getMedicationById(id: Long): Medication?
+    suspend fun getMedicationsByOwner(ownerUserId: Long): List<Medication>
     fun observeMedicationsByOwner(ownerUserId: Long): LiveData<List<Medication>>
     fun observeMedicationById(id: Long): LiveData<Medication?>
 

@@ -23,7 +23,9 @@ class AlarmScheduler(private val context: Context) {
 
     fun schedule(scheduleId: Long, medicationId: Long, time: String, daysOfWeek: String, now: LocalDateTime = LocalDateTime.now()) {
         val triggerAtMillis = nextTriggerMillis(time, daysOfWeek, now) ?: return
-        val pendingIntent = pendingIntentFor(scheduleId, medicationId)
+        // Carrying the nominal trigger time lets MedicationAlarmReceiver stamp the log with the
+        // intended dose time instead of the actual (possibly Doze-delayed) firing time.
+        val pendingIntent = pendingIntentFor(scheduleId, medicationId, triggerAtMillis = triggerAtMillis)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
         } else {
@@ -85,14 +87,23 @@ class AlarmScheduler(private val context: Context) {
         workManager.enqueueUniqueWork(missedDoseWorkName(scheduleId), ExistingWorkPolicy.REPLACE, request)
     }
 
-    private fun pendingIntentFor(scheduleId: Long, medicationId: Long, logId: Long? = null): PendingIntent {
+    private fun pendingIntentFor(
+        scheduleId: Long,
+        medicationId: Long,
+        logId: Long? = null,
+        triggerAtMillis: Long? = null
+    ): PendingIntent {
         val intent = Intent(context, MedicationAlarmReceiver::class.java).apply {
             putExtra(EXTRA_SCHEDULE_ID, scheduleId)
             putExtra(EXTRA_MEDICATION_ID, medicationId)
             if (logId != null) putExtra(EXTRA_LOG_ID, logId)
+            if (triggerAtMillis != null) putExtra(EXTRA_TRIGGER_AT_MILLIS, triggerAtMillis)
         }
         return PendingIntent.getBroadcast(
             context,
+            // Room ids are Long-autoincrement while PendingIntent request codes are Int; this
+            // truncates. Accepted for this local, single-device app whose schedule count will
+            // never realistically approach Int.MAX_VALUE rows.
             scheduleId.toInt(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -103,6 +114,7 @@ class AlarmScheduler(private val context: Context) {
         const val EXTRA_SCHEDULE_ID = "scheduleId"
         const val EXTRA_MEDICATION_ID = "medicationId"
         const val EXTRA_LOG_ID = "logId"
+        const val EXTRA_TRIGGER_AT_MILLIS = "triggerAtMillis"
         const val POSTPONE_MINUTES = 15L
         const val MISSED_DOSE_CHECK_DELAY_MINUTES = 30L
 

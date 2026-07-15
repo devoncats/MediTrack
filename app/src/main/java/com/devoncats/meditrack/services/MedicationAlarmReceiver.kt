@@ -18,6 +18,10 @@ class MedicationAlarmReceiver : BroadcastReceiver() {
         // Present only when this fire is a postponed repeat of an already-shown reminder
         // (see AlarmScheduler.postpone); absent on the original scheduled fire.
         val postponedLogId = intent.getLongExtra(AlarmScheduler.EXTRA_LOG_ID, -1L).takeIf { it != -1L }
+        // The intended dose time, not the (possibly Doze-delayed) actual firing time; falls
+        // back to "now" only for callers that predate this extra (e.g. a stale PendingIntent).
+        val nominalScheduledDatetime = intent.getLongExtra(AlarmScheduler.EXTRA_TRIGGER_AT_MILLIS, -1L)
+            .takeIf { it != -1L } ?: System.currentTimeMillis()
         if (medicationId == -1L || scheduleId == -1L) return
 
         val pendingResult = goAsync()
@@ -40,7 +44,7 @@ class MedicationAlarmReceiver : BroadcastReceiver() {
                             MedicationLogEntity(
                                 medicationId = medicationId,
                                 scheduleId = scheduleId,
-                                scheduledDatetime = System.currentTimeMillis(),
+                                scheduledDatetime = nominalScheduledDatetime,
                                 confirmedAt = null,
                                 status = MedicationLogStatus.PENDING
                             )

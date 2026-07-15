@@ -192,4 +192,32 @@ class MedicationAlarmReceiverTest {
         val notificationManager = context.getSystemService(NotificationManager::class.java)
         notificationManager.cancel(originalLogId.toInt())
     }
+
+    @Test
+    fun onReceive_stampsTheLogWithTheNominalTriggerTimeInsteadOfWallClockNow(): Unit = runBlocking {
+        // Regression test: the log's scheduledDatetime must reflect the intended dose time
+        // (carried via EXTRA_TRIGGER_AT_MILLIS), not whenever the alarm actually fired.
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val scheduleId = MediTrackDatabase.getInstance(context).scheduleDao().insert(
+            ScheduleEntity(medicationId = medicationId, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        )
+        val nominalTriggerMillis = System.currentTimeMillis() - 5 * 60_000L
+
+        val intent = Intent(context, MedicationAlarmReceiver::class.java).apply {
+            putExtra(AlarmScheduler.EXTRA_MEDICATION_ID, medicationId)
+            putExtra(AlarmScheduler.EXTRA_SCHEDULE_ID, scheduleId)
+            putExtra(AlarmScheduler.EXTRA_TRIGGER_AT_MILLIS, nominalTriggerMillis)
+        }
+        context.sendBroadcast(intent)
+        Thread.sleep(1000)
+
+        val logDao = MediTrackDatabase.getInstance(context).medicationLogDao()
+        val insertedLog = logDao.observeByMedication(medicationId).getOrAwaitValue()?.firstOrNull()
+
+        assertNotNull("expected a MedicationLog to be created", insertedLog)
+        assertEquals(nominalTriggerMillis, insertedLog!!.scheduledDatetime)
+
+        val notificationManager = context.getSystemService(NotificationManager::class.java)
+        notificationManager.cancel(insertedLog.id.toInt())
+    }
 }

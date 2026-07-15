@@ -20,7 +20,12 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        redirectIfSessionActive()
+        // NavHostFragment retains its back stack across config changes, so only redirect on a
+        // genuinely fresh start — otherwise rotating inside a deep screen would reset it back
+        // to the role graph's start destination.
+        if (savedInstanceState == null) {
+            redirectIfSessionActive()
+        }
     }
 
     private fun redirectIfSessionActive() {

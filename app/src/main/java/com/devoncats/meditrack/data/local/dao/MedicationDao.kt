@@ -25,6 +25,9 @@ interface MedicationDao {
     @Query("SELECT * FROM medications WHERE ownerUserId = :ownerUserId ORDER BY name ASC")
     fun observeByOwner(ownerUserId: Long): LiveData<List<MedicationEntity>>
 
+    @Query("SELECT * FROM medications WHERE ownerUserId = :ownerUserId ORDER BY name ASC")
+    suspend fun getByOwner(ownerUserId: Long): List<MedicationEntity>
+
     @Query("SELECT * FROM medications WHERE id = :id LIMIT 1")
     fun observeById(id: Long): LiveData<MedicationEntity?>
 }

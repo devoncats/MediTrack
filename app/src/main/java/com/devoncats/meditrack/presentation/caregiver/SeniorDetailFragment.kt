@@ -35,6 +35,11 @@ class SeniorDetailFragment : Fragment(R.layout.fragment_senior_detail) {
         EmergencyContactViewModelFactory(requireContext(), seniorUserId)
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshTodayRange()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
