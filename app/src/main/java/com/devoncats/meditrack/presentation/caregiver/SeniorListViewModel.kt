@@ -1,7 +1,6 @@
 package com.devoncats.meditrack.presentation.caregiver
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
@@ -13,6 +12,7 @@ import com.devoncats.meditrack.domain.repository.UserRepository
 import com.devoncats.meditrack.services.AlarmScheduler
 import com.devoncats.meditrack.services.FileStorageHelper
 import com.devoncats.meditrack.utils.DateUtils
+import com.devoncats.meditrack.utils.combineLatest
 import kotlinx.coroutines.launch
 
 data class SeniorListItem(
@@ -37,23 +37,17 @@ class SeniorListViewModel(
         if (todayRange.value != current) todayRange.value = current
     }
 
-    val seniorItems: LiveData<List<SeniorListItem>> = MediatorLiveData<List<SeniorListItem>>().apply {
-        val seniorsLiveData = userRepository.observeSeniorPatientsByCaregiver(caregiverId)
-        val statusesLiveData = todayRange.switchMap { (startInclusive, endExclusive) ->
+    val seniorItems: LiveData<List<SeniorListItem>> = combineLatest(
+        userRepository.observeSeniorPatientsByCaregiver(caregiverId),
+        todayRange.switchMap { (startInclusive, endExclusive) ->
             medicationRepository.observeTodayLogStatusesForCaregiverSeniors(caregiverId, startInclusive, endExclusive)
+        },
+        emptyList()
+    ) { seniors, statuses ->
+        seniors.map { senior ->
+            val seniorStatuses = statuses.filter { it.seniorId == senior.id }.map { it.status }
+            SeniorListItem(senior, aggregateStatus(seniorStatuses))
         }
-
-        fun combine() {
-            val seniors = seniorsLiveData.value ?: return
-            val statuses = statusesLiveData.value.orEmpty()
-            value = seniors.map { senior ->
-                val seniorStatuses = statuses.filter { it.seniorId == senior.id }.map { it.status }
-                SeniorListItem(senior, aggregateStatus(seniorStatuses))
-            }
-        }
-
-        addSource(seniorsLiveData) { combine() }
-        addSource(statusesLiveData) { combine() }
     }
 
     fun deleteSenior(senior: User) {

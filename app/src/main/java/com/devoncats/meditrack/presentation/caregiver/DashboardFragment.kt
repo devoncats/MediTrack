@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devoncats.meditrack.R
+import com.devoncats.meditrack.presentation.NavArgKeys
 import com.devoncats.meditrack.presentation.logout
 import com.devoncats.meditrack.presentation.patient.MedListViewModel
 import com.devoncats.meditrack.presentation.patient.MedListViewModelFactory
@@ -44,7 +45,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             onItemClick = { item ->
                 findNavController().navigate(
                     R.id.action_dashboard_to_medDetail,
-                    bundleOf("medicationId" to item.medication.id)
+                    bundleOf(NavArgKeys.MEDICATION_ID to item.medication.id)
                 )
             },
             onPendingStatusClick = { item ->
@@ -52,7 +53,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                     if (scheduleId != null) {
                         findNavController().navigate(
                             R.id.action_dashboard_to_alert,
-                            bundleOf("scheduleId" to scheduleId)
+                            bundleOf(NavArgKeys.SCHEDULE_ID to scheduleId)
                         )
                     }
                 }
@@ -65,7 +66,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
             onItemClick = { alert ->
                 findNavController().navigate(
                     R.id.action_dashboard_to_missedDoseAlert,
-                    bundleOf("logId" to alert.logId)
+                    bundleOf(NavArgKeys.LOG_ID to alert.logId)
                 )
             }
         )

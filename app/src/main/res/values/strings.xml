@@ -145,4 +145,5 @@
     <string name="camera_capture_content_description">Capturar foto</string>
     <string name="camera_permission_denied_message">Se necesita permiso de cámara para tomar una foto del medicamento. Otórgalo para continuar.</string>
     <string name="camera_permission_grant_button">Conceder permiso</string>
+    <string name="camera_capture_error">No se pudo tomar la foto. Intenta de nuevo.</string>
 </resources>

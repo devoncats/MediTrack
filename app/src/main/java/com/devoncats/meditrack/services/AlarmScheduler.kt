@@ -26,11 +26,7 @@ class AlarmScheduler(private val context: Context) {
         // Carrying the nominal trigger time lets MedicationAlarmReceiver stamp the log with the
         // intended dose time instead of the actual (possibly Doze-delayed) firing time.
         val pendingIntent = pendingIntentFor(scheduleId, medicationId, triggerAtMillis = triggerAtMillis)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-        } else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-        }
+        setExactAlarm(triggerAtMillis, pendingIntent)
         enqueueMissedDoseCheck(scheduleId, medicationId, triggerAtMillis)
     }
 
@@ -45,11 +41,7 @@ class AlarmScheduler(private val context: Context) {
         // Carrying the original logId lets MedicationAlarmReceiver recognize this re-fire
         // as a reminder repeat and reuse the existing log instead of inserting a duplicate.
         val pendingIntent = pendingIntentFor(scheduleId, medicationId, logId)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-        } else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-        }
+        setExactAlarm(triggerAtMillis, pendingIntent)
         enqueueMissedDoseCheck(scheduleId, medicationId, triggerAtMillis)
     }
 
@@ -70,6 +62,14 @@ class AlarmScheduler(private val context: Context) {
         alarmManager.cancel(pendingIntent)
         pendingIntent.cancel()
         workManager.cancelUniqueWork(missedDoseWorkName(scheduleId))
+    }
+
+    private fun setExactAlarm(triggerAtMillis: Long, pendingIntent: PendingIntent) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+        }
     }
 
     private fun enqueueMissedDoseCheck(scheduleId: Long, medicationId: Long, triggerAtMillis: Long) {

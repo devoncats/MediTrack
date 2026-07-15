@@ -62,7 +62,6 @@
         <argument
             android:name="scheduleId"
             app:argType="long" />
-        <deepLink app:uri="meditrack://alert/{scheduleId}" />
     </fragment>
 
 </navigation>

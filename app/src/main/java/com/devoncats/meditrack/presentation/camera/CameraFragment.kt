@@ -15,6 +15,7 @@ import com.devoncats.meditrack.R
 import com.devoncats.meditrack.services.CameraHelper
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 
 class CameraFragment : Fragment(R.layout.fragment_camera) {
 
@@ -60,7 +61,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                 setFragmentResult(RESULT_KEY, bundleOf(RESULT_PHOTO_URI to uri.toString()))
                 findNavController().popBackStack()
             },
-            onError = { }
+            onError = {
+                view?.let { root -> Snackbar.make(root, R.string.camera_capture_error, Snackbar.LENGTH_LONG).show() }
+            }
         )
     }
 

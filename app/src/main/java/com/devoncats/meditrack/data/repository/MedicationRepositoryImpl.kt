@@ -78,6 +78,14 @@ class MedicationRepositoryImpl(
     override fun observeLogsByMedication(medicationId: Long): LiveData<List<MedicationLog>> =
         medicationLogDao.observeByMedication(medicationId).map { list -> list.map { it.toDomain() } }
 
+    override fun observeLogsByMedicationBetween(
+        medicationId: Long,
+        startInclusive: Long,
+        endExclusive: Long
+    ): LiveData<List<MedicationLog>> =
+        medicationLogDao.observeByMedicationBetween(medicationId, startInclusive, endExclusive)
+            .map { list -> list.map { it.toDomain() } }
+
     override fun observeLogsByOwnerBetween(
         ownerUserId: Long,
         startInclusive: Long,

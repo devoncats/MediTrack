@@ -7,9 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.devoncats.meditrack.domain.repository.EmergencyContactRepository
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.domain.repository.UserRepository
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import com.devoncats.meditrack.utils.DateUtils
 import kotlinx.coroutines.launch
 
 data class MissedDoseAlertInfo(
@@ -36,10 +34,7 @@ class MissedDoseAlertViewModel(
             val senior = userRepository.findById(medication.ownerUserId) ?: return@launch
             val contact = emergencyContactRepository.findByUserId(senior.id)
 
-            val scheduledTime = Instant.ofEpochMilli(log.scheduledDatetime)
-                .atZone(ZoneId.systemDefault())
-                .toLocalTime()
-                .format(DateTimeFormatter.ofPattern("HH:mm"))
+            val scheduledTime = DateUtils.formatTime(log.scheduledDatetime)
 
             _alertInfo.value = MissedDoseAlertInfo(
                 seniorName = senior.name,

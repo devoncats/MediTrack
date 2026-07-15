@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devoncats.meditrack.R
+import com.devoncats.meditrack.presentation.NavArgKeys
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class SeniorListFragment : Fragment(R.layout.fragment_senior_list) {
@@ -34,7 +35,7 @@ class SeniorListFragment : Fragment(R.layout.fragment_senior_list) {
             onItemClick = { item ->
                 findNavController().navigate(
                     R.id.action_seniorList_to_seniorDetail,
-                    bundleOf("seniorUserId" to item.senior.id, "seniorName" to item.senior.name)
+                    bundleOf(NavArgKeys.SENIOR_USER_ID to item.senior.id, NavArgKeys.SENIOR_NAME to item.senior.name)
                 )
             },
             onDeleteClick = { item -> showDeleteConfirmation(item) }

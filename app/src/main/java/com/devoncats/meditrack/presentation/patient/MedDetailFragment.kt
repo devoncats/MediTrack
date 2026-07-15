@@ -14,20 +14,19 @@ import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
 import com.devoncats.meditrack.domain.model.MedicationLog
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
+import com.devoncats.meditrack.presentation.NavArgKeys
 import com.devoncats.meditrack.services.FileStorageHelper
+import com.devoncats.meditrack.utils.DateUtils
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
 
     private val medicationId: Long
-        get() = arguments?.getLong("medicationId", -1L) ?: -1L
+        get() = arguments?.getLong(NavArgKeys.MEDICATION_ID, -1L) ?: -1L
 
     private val seniorUserId: Long
-        get() = arguments?.getLong("seniorUserId", MedFormViewModelFactory.NO_SENIOR_USER_ID)
+        get() = arguments?.getLong(NavArgKeys.SENIOR_USER_ID, MedFormViewModelFactory.NO_SENIOR_USER_ID)
             ?: MedFormViewModelFactory.NO_SENIOR_USER_ID
 
     private val viewModel: MedDetailViewModel by viewModels {
@@ -35,6 +34,11 @@ class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
     }
 
     private val fileStorageHelper by lazy { FileStorageHelper(requireContext()) }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshTodayRange()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,9 +72,9 @@ class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
             }
 
             editButton.setOnClickListener {
-                val args = bundleOf("medicationId" to medication.id)
+                val args = bundleOf(NavArgKeys.MEDICATION_ID to medication.id)
                 if (seniorUserId != MedFormViewModelFactory.NO_SENIOR_USER_ID) {
-                    args.putLong("seniorUserId", seniorUserId)
+                    args.putLong(NavArgKeys.SENIOR_USER_ID, seniorUserId)
                 }
                 findNavController().navigate(R.id.action_medDetail_to_medForm, args)
             }
@@ -99,11 +103,9 @@ class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
 
     private fun renderTodayLogs(container: LinearLayout, logs: List<MedicationLog>) {
         container.removeAllViews()
-        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
         logs.forEach { log ->
             val row = LayoutInflater.from(requireContext()).inflate(R.layout.item_medication_log, container, false)
-            val time = Instant.ofEpochMilli(log.scheduledDatetime).atZone(ZoneId.systemDefault()).toLocalTime()
-            row.findViewById<TextView>(R.id.logTime).text = time.format(timeFormatter)
+            row.findViewById<TextView>(R.id.logTime).text = DateUtils.formatTime(log.scheduledDatetime)
             row.findViewById<Chip>(R.id.logStatusChip).setText(
                 when (log.status) {
                     MedicationLogStatus.CONFIRMED -> R.string.med_status_confirmed

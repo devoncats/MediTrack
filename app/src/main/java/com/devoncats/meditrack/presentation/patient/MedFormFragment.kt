@@ -3,16 +3,16 @@ package com.devoncats.meditrack.presentation.patient
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
+import com.devoncats.meditrack.presentation.NavArgKeys
 import com.devoncats.meditrack.presentation.camera.CameraFragment
 import com.devoncats.meditrack.services.FileStorageHelper
 import com.devoncats.meditrack.utils.toCode
@@ -28,10 +28,10 @@ import java.time.LocalTime
 class MedFormFragment : Fragment(R.layout.fragment_med_form) {
 
     private val medicationId: Long
-        get() = arguments?.getLong("medicationId", MedFormViewModel.NEW_MEDICATION_ID) ?: MedFormViewModel.NEW_MEDICATION_ID
+        get() = arguments?.getLong(NavArgKeys.MEDICATION_ID, MedFormViewModel.NEW_MEDICATION_ID) ?: MedFormViewModel.NEW_MEDICATION_ID
 
     private val seniorUserId: Long
-        get() = arguments?.getLong("seniorUserId", MedFormViewModelFactory.NO_SENIOR_USER_ID)
+        get() = arguments?.getLong(NavArgKeys.SENIOR_USER_ID, MedFormViewModelFactory.NO_SENIOR_USER_ID)
             ?: MedFormViewModelFactory.NO_SENIOR_USER_ID
 
     private val viewModel: MedFormViewModel by viewModels {
@@ -96,14 +96,9 @@ class MedFormFragment : Fragment(R.layout.fragment_med_form) {
                 selectedTimes.isNotEmpty()
         }
 
-        val fieldsWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
-            override fun afterTextChanged(s: Editable?) = updateSaveButtonState()
-        }
-        nameEditText.addTextChangedListener(fieldsWatcher)
-        doseEditText.addTextChangedListener(fieldsWatcher)
-        frequencyEditText.addTextChangedListener(fieldsWatcher)
+        nameEditText.doAfterTextChanged { updateSaveButtonState() }
+        doseEditText.doAfterTextChanged { updateSaveButtonState() }
+        frequencyEditText.doAfterTextChanged { updateSaveButtonState() }
         daysOfWeekChipGroup.setOnCheckedStateChangeListener { _, _ -> updateSaveButtonState() }
 
         @SuppressLint("SetTextI18n")

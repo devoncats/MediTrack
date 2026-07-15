@@ -1,9 +1,8 @@
 package com.devoncats.meditrack.presentation.auth
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -29,16 +28,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val errorTextView = view.findViewById<View>(R.id.errorTextView)
         val registerLinkTextView = view.findViewById<View>(R.id.registerLinkTextView)
 
-        val fieldsWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
-            override fun afterTextChanged(s: Editable?) {
-                loginButton.isEnabled = !emailEditText.text.isNullOrBlank() &&
-                    !passwordEditText.text.isNullOrBlank()
-            }
+        fun updateButtonState() {
+            loginButton.isEnabled = !emailEditText.text.isNullOrBlank() &&
+                !passwordEditText.text.isNullOrBlank()
         }
-        emailEditText.addTextChangedListener(fieldsWatcher)
-        passwordEditText.addTextChangedListener(fieldsWatcher)
+        emailEditText.doAfterTextChanged { updateButtonState() }
+        passwordEditText.doAfterTextChanged { updateButtonState() }
 
         loginButton.setOnClickListener {
             errorTextView.visibility = View.GONE

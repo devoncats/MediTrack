@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devoncats.meditrack.R
 import com.devoncats.meditrack.domain.model.EmergencyContact
+import com.devoncats.meditrack.presentation.NavArgKeys
 import com.devoncats.meditrack.presentation.patient.MedListViewModel
 import com.devoncats.meditrack.presentation.patient.MedicationListAdapter
 import com.google.android.material.button.MaterialButton
@@ -22,10 +23,10 @@ import com.google.android.material.textfield.TextInputEditText
 class SeniorDetailFragment : Fragment(R.layout.fragment_senior_detail) {
 
     private val seniorUserId: Long
-        get() = requireArguments().getLong("seniorUserId")
+        get() = requireArguments().getLong(NavArgKeys.SENIOR_USER_ID)
 
     private val seniorName: String
-        get() = requireArguments().getString("seniorName").orEmpty()
+        get() = requireArguments().getString(NavArgKeys.SENIOR_NAME).orEmpty()
 
     private val viewModel: MedListViewModel by viewModels {
         SeniorDetailViewModelFactory(requireContext(), seniorUserId)
@@ -67,7 +68,7 @@ class SeniorDetailFragment : Fragment(R.layout.fragment_senior_detail) {
             onItemClick = { item ->
                 findNavController().navigate(
                     R.id.action_seniorDetail_to_seniorMedDetail,
-                    bundleOf("medicationId" to item.medication.id, "seniorUserId" to seniorUserId)
+                    bundleOf(NavArgKeys.MEDICATION_ID to item.medication.id, NavArgKeys.SENIOR_USER_ID to seniorUserId)
                 )
             },
             onPendingStatusClick = { }
@@ -78,7 +79,7 @@ class SeniorDetailFragment : Fragment(R.layout.fragment_senior_detail) {
         addMedicationFab.setOnClickListener {
             findNavController().navigate(
                 R.id.action_seniorDetail_to_seniorMedForm,
-                bundleOf("seniorUserId" to seniorUserId)
+                bundleOf(NavArgKeys.SENIOR_USER_ID to seniorUserId)
             )
         }
 

@@ -15,10 +15,6 @@ data class SeniorAlertInfo(
     val scheduledTime: String
 )
 
-sealed class SeniorAlertActionResult {
-    data object Confirmed : SeniorAlertActionResult()
-}
-
 class SeniorAlertViewModel(
     private val medicationRepository: MedicationRepository,
     private val alarmScheduler: AlarmScheduler,
@@ -28,8 +24,10 @@ class SeniorAlertViewModel(
     private val _alertInfo = MutableLiveData<SeniorAlertInfo?>()
     val alertInfo: LiveData<SeniorAlertInfo?> = _alertInfo
 
-    private val _actionResult = MutableLiveData<SeniorAlertActionResult>()
-    val actionResult: LiveData<SeniorAlertActionResult> = _actionResult
+    // The only outcome for this screen (confirm) is to close it; a sealed result type with a
+    // single variant isn't worth it.
+    private val _closeScreen = MutableLiveData<Unit>()
+    val closeScreen: LiveData<Unit> = _closeScreen
 
     private var logId: Long? = null
 
@@ -60,7 +58,7 @@ class SeniorAlertViewModel(
             medicationRepository.getScheduleById(scheduleId)?.let { schedule ->
                 alarmScheduler.schedule(scheduleId, log.medicationId, schedule.time, schedule.daysOfWeek)
             }
-            _actionResult.value = SeniorAlertActionResult.Confirmed
+            _closeScreen.value = Unit
         }
     }
 }

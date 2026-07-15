@@ -29,6 +29,11 @@ interface MedicationRepository {
     suspend fun getLogById(id: Long): MedicationLog?
     suspend fun getLatestPendingLogForSchedule(scheduleId: Long): MedicationLog?
     fun observeLogsByMedication(medicationId: Long): LiveData<List<MedicationLog>>
+    fun observeLogsByMedicationBetween(
+        medicationId: Long,
+        startInclusive: Long,
+        endExclusive: Long
+    ): LiveData<List<MedicationLog>>
     fun observeLogsByOwnerBetween(ownerUserId: Long, startInclusive: Long, endExclusive: Long): LiveData<List<MedicationLog>>
     fun observeMissedDoseAlertsForCaregiver(caregiverId: Long): LiveData<List<MissedDoseAlert>>
     fun observeTodayLogStatusesForCaregiverSeniors(

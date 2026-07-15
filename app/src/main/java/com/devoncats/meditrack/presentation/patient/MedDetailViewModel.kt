@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.MedicationLog
@@ -22,12 +23,21 @@ class MedDetailViewModel(
 
     val medication: LiveData<Medication?> = medicationRepository.observeMedicationById(medicationId)
 
-    val todayLogs: LiveData<List<MedicationLog>> = medicationRepository.observeLogsByMedication(medicationId)
-        .map { logs ->
-            val (startInclusive, endExclusive) = DateUtils.todayRangeMillis()
-            logs.filter { it.scheduledDatetime in startInclusive until endExclusive }
-                .sortedBy { it.scheduledDatetime }
-        }
+    private val todayRange = MutableLiveData(DateUtils.todayRangeMillis())
+
+    // Re-reads the current day boundaries; called from the fragment's onResume so "today's
+    // history" doesn't stay pinned to whatever day the ViewModel happened to be created on.
+    fun refreshTodayRange() {
+        val current = DateUtils.todayRangeMillis()
+        if (todayRange.value != current) todayRange.value = current
+    }
+
+    // Filtered by query (same criterion as the other list ViewModels) rather than fetching
+    // every log for this medication and filtering "today" in memory.
+    val todayLogs: LiveData<List<MedicationLog>> = todayRange.switchMap { (startInclusive, endExclusive) ->
+        medicationRepository.observeLogsByMedicationBetween(medicationId, startInclusive, endExclusive)
+            .map { logs -> logs.sortedBy { it.scheduledDatetime } }
+    }
 
     private val _deleted = MutableLiveData<Boolean>()
     val deleted: LiveData<Boolean> = _deleted

@@ -17,12 +17,6 @@ data class AlertInfo(
     val scheduledTime: String
 )
 
-sealed class AlertActionResult {
-    data object Confirmed : AlertActionResult()
-    data object Postponed : AlertActionResult()
-    data object Dismissed : AlertActionResult()
-}
-
 class AlertViewModel(
     private val medicationRepository: MedicationRepository,
     private val alarmScheduler: AlarmScheduler,
@@ -32,8 +26,10 @@ class AlertViewModel(
     private val _alertInfo = MutableLiveData<AlertInfo?>()
     val alertInfo: LiveData<AlertInfo?> = _alertInfo
 
-    private val _actionResult = MutableLiveData<AlertActionResult>()
-    val actionResult: LiveData<AlertActionResult> = _actionResult
+    // Confirm/postpone/dismiss all resolve to the same outcome for this screen: close it.
+    // A richer result type isn't worth it while nothing downstream distinguishes between them.
+    private val _closeScreen = MutableLiveData<Unit>()
+    val closeScreen: LiveData<Unit> = _closeScreen
 
     init {
         viewModelScope.launch {
@@ -63,17 +59,17 @@ class AlertViewModel(
             medicationRepository.getScheduleById(scheduleId)?.let { schedule ->
                 alarmScheduler.schedule(scheduleId, info.medicationId, schedule.time, schedule.daysOfWeek)
             }
-            _actionResult.value = AlertActionResult.Confirmed
+            _closeScreen.value = Unit
         }
     }
 
     fun postpone() {
         val info = _alertInfo.value ?: return
         alarmScheduler.postpone(scheduleId, info.medicationId, info.logId)
-        _actionResult.value = AlertActionResult.Postponed
+        _closeScreen.value = Unit
     }
 
     fun dismiss() {
-        _actionResult.value = AlertActionResult.Dismissed
+        _closeScreen.value = Unit
     }
 }

@@ -33,6 +33,17 @@ interface MedicationLogDao {
     fun observeByMedication(medicationId: Long): LiveData<List<MedicationLogEntity>>
 
     @Query(
+        "SELECT * FROM medication_logs WHERE medicationId = :medicationId " +
+            "AND scheduledDatetime >= :startInclusive AND scheduledDatetime < :endExclusive " +
+            "ORDER BY scheduledDatetime DESC"
+    )
+    fun observeByMedicationBetween(
+        medicationId: Long,
+        startInclusive: Long,
+        endExclusive: Long
+    ): LiveData<List<MedicationLogEntity>>
+
+    @Query(
         """
         SELECT medication_logs.* FROM medication_logs
         INNER JOIN medications ON medications.id = medication_logs.medicationId
