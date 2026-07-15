@@ -7,12 +7,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
+import com.devoncats.meditrack.presentation.NavArgKeys
 import com.google.android.material.button.MaterialButton
 
 class SeniorAlertFragment : Fragment(R.layout.fragment_senior_alert) {
 
     private val scheduleId: Long
-        get() = arguments?.getLong("scheduleId", -1L) ?: -1L
+        get() = arguments?.getLong(NavArgKeys.SCHEDULE_ID, -1L) ?: -1L
 
     private val viewModel: SeniorAlertViewModel by viewModels {
         SeniorAlertViewModelFactory(requireContext(), scheduleId)
@@ -35,7 +36,7 @@ class SeniorAlertFragment : Fragment(R.layout.fragment_senior_alert) {
 
         confirmButton.setOnClickListener { viewModel.confirm() }
 
-        viewModel.actionResult.observe(viewLifecycleOwner) {
+        viewModel.closeScreen.observe(viewLifecycleOwner) {
             findNavController().popBackStack()
         }
     }

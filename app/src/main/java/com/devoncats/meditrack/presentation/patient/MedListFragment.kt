@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devoncats.meditrack.R
+import com.devoncats.meditrack.presentation.NavArgKeys
 import com.devoncats.meditrack.presentation.logout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -34,7 +35,7 @@ class MedListFragment : Fragment(R.layout.fragment_med_list) {
             onItemClick = { item ->
                 findNavController().navigate(
                     R.id.action_medList_to_medDetail,
-                    bundleOf("medicationId" to item.medication.id)
+                    bundleOf(NavArgKeys.MEDICATION_ID to item.medication.id)
                 )
             },
             onPendingStatusClick = { item ->
@@ -42,7 +43,7 @@ class MedListFragment : Fragment(R.layout.fragment_med_list) {
                     if (scheduleId != null) {
                         findNavController().navigate(
                             R.id.action_medList_to_alert,
-                            bundleOf("scheduleId" to scheduleId)
+                            bundleOf(NavArgKeys.SCHEDULE_ID to scheduleId)
                         )
                     }
                 }

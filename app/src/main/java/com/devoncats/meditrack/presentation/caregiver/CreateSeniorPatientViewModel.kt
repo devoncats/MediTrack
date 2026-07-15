@@ -10,7 +10,7 @@ import com.devoncats.meditrack.domain.model.UserRole
 import com.devoncats.meditrack.domain.repository.EmergencyContactRepository
 import com.devoncats.meditrack.domain.repository.UserRepository
 import com.devoncats.meditrack.utils.PasswordHasher
-import kotlin.random.Random
+import java.security.SecureRandom
 import kotlinx.coroutines.launch
 
 data class GeneratedCredentials(val username: String, val pin: String)
@@ -84,6 +84,8 @@ class CreateSeniorPatientViewModel(
             return "pm_${normalized}_$caregiverId"
         }
 
-        internal fun generatePin(): String = "%06d".format(Random.nextInt(0, 1_000_000))
+        // The PIN is a login credential (like a password), so it needs a
+        // cryptographically secure source, not kotlin.random.Random's predictable PRNG.
+        internal fun generatePin(): String = "%06d".format(SecureRandom().nextInt(1_000_000))
     }
 }

@@ -21,6 +21,10 @@ android {
 
     buildTypes {
         release {
+            // R8/minification stays off for now: enabling it (optimization.enable = true) on
+            // AGP 9.2.1 requires opting into the incubating `android.r8.gradual.support` Gradle
+            // flag, since this DSL is still a preview API. Revisit once it's stable, or once
+            // the project is closer to an actual production release.
             optimization {
                 enable = false
             }

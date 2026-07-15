@@ -12,6 +12,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.os.bundleOf
 import androidx.navigation.NavDeepLinkBuilder
 import com.devoncats.meditrack.R
+import com.devoncats.meditrack.presentation.NavArgKeys
 
 class NotificationHelper(private val context: Context) {
 
@@ -29,7 +30,7 @@ class NotificationHelper(private val context: Context) {
         val contentIntent = NavDeepLinkBuilder(context)
             .setGraph(R.navigation.main_nav_graph)
             .setDestination(if (isSeniorPatient) R.id.seniorAlertFragment else R.id.alertFragment)
-            .setArguments(bundleOf("scheduleId" to scheduleId))
+            .setArguments(bundleOf(NavArgKeys.SCHEDULE_ID to scheduleId))
             .createPendingIntent()
 
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
@@ -64,7 +65,7 @@ class NotificationHelper(private val context: Context) {
         val contentIntent = NavDeepLinkBuilder(context)
             .setGraph(R.navigation.main_nav_graph)
             .setDestination(R.id.missedDoseAlertFragment)
-            .setArguments(bundleOf("logId" to logId))
+            .setArguments(bundleOf(NavArgKeys.LOG_ID to logId))
             .createPendingIntent()
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)

@@ -9,9 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.devoncats.meditrack.R
 import com.devoncats.meditrack.domain.model.MissedDoseAlert
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import com.devoncats.meditrack.utils.DateUtils
 
 class MissedDoseAlertAdapter(
     private val onItemClick: (MissedDoseAlert) -> Unit
@@ -34,15 +32,11 @@ class MissedDoseAlertAdapter(
         private val seniorNameTextView = itemView.findViewById<TextView>(R.id.missedDoseSeniorName)
         private val medicationNameTextView = itemView.findViewById<TextView>(R.id.missedDoseMedicationName)
         private val timeTextView = itemView.findViewById<TextView>(R.id.missedDoseTime)
-        private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
         fun bind(item: MissedDoseAlert) {
             seniorNameTextView.text = item.seniorName
             medicationNameTextView.text = item.medicationName
-            timeTextView.text = Instant.ofEpochMilli(item.scheduledDatetime)
-                .atZone(ZoneId.systemDefault())
-                .toLocalTime()
-                .format(timeFormatter)
+            timeTextView.text = DateUtils.formatTime(item.scheduledDatetime)
             itemView.setOnClickListener { onItemClick(item) }
         }
     }
