@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.domain.usecase.RegisterResult
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 

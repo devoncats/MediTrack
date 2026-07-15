@@ -4,9 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.repository.MedicationRepository
-import com.devoncats.meditrack.services.AlarmScheduler
+import com.devoncats.meditrack.domain.usecase.ConfirmDoseUseCase
 import com.devoncats.meditrack.utils.toHHmm
 import kotlinx.coroutines.launch
 
@@ -18,7 +17,7 @@ data class SeniorAlertInfo(
 
 class SeniorAlertViewModel(
     private val medicationRepository: MedicationRepository,
-    private val alarmScheduler: AlarmScheduler,
+    private val confirmDoseUseCase: ConfirmDoseUseCase,
     private val scheduleId: Long
 ) : ViewModel() {
 
@@ -50,15 +49,7 @@ class SeniorAlertViewModel(
     fun confirm() {
         val currentLogId = logId ?: return
         viewModelScope.launch {
-            val log = medicationRepository.getLogById(currentLogId) ?: return@launch
-            medicationRepository.updateLog(
-                log.copy(confirmedAt = System.currentTimeMillis(), status = MedicationLogStatus.CONFIRMED)
-            )
-            // Line up the next occurrence now that this dose is resolved; this also
-            // supersedes the still-pending missed-dose check for this dose.
-            medicationRepository.getScheduleById(scheduleId)?.let { schedule ->
-                alarmScheduler.schedule(scheduleId, log.medicationId, schedule.time, schedule.daysOfWeek)
-            }
+            confirmDoseUseCase(currentLogId, scheduleId)
             _closeScreen.value = Unit
         }
     }

@@ -21,6 +21,7 @@ interface MedicationRepository {
     suspend fun deleteSchedule(schedule: Schedule)
     suspend fun getSchedulesByMedication(medicationId: Long): List<Schedule>
     suspend fun getScheduleById(id: Long): Schedule?
+    suspend fun getAllSchedules(): List<Schedule>
     fun observeSchedulesByMedication(medicationId: Long): Flow<List<Schedule>>
 
     suspend fun insertLog(log: MedicationLog): Long

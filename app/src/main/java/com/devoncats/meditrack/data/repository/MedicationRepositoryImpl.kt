@@ -61,6 +61,9 @@ class MedicationRepositoryImpl(
     override suspend fun getScheduleById(id: Long): Schedule? =
         scheduleDao.findById(id)?.toDomain()
 
+    override suspend fun getAllSchedules(): List<Schedule> =
+        scheduleDao.getAll().map { it.toDomain() }
+
     override fun observeSchedulesByMedication(medicationId: Long): Flow<List<Schedule>> =
         scheduleDao.observeByMedication(medicationId).map { list -> list.map { it.toDomain() } }
 

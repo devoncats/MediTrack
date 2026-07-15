@@ -7,6 +7,7 @@ import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.data.repository.EmergencyContactRepositoryImpl
 import com.devoncats.meditrack.data.repository.UserRepositoryImpl
+import com.devoncats.meditrack.domain.usecase.CreateSeniorPatientUseCase
 
 class CreateSeniorPatientViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
@@ -15,9 +16,10 @@ class CreateSeniorPatientViewModelFactory(context: Context) : ViewModelProvider.
     private val emergencyContactRepository = EmergencyContactRepositoryImpl(
         MediTrackDatabase.getInstance(appContext).emergencyContactDao()
     )
+    private val createSeniorPatientUseCase = CreateSeniorPatientUseCase(userRepository, emergencyContactRepository)
     private val caregiverId = SessionManager(appContext).getUserId()
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        CreateSeniorPatientViewModel(userRepository, emergencyContactRepository, caregiverId) as T
+        CreateSeniorPatientViewModel(createSeniorPatientUseCase, caregiverId) as T
 }

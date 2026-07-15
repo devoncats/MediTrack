@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import com.devoncats.meditrack.data.local.MediTrackDatabase
-import com.devoncats.meditrack.domain.model.MedicationLogStatus
-import com.devoncats.meditrack.utils.toLocalTime
-import com.devoncats.meditrack.utils.toWeekDays
+import com.devoncats.meditrack.data.repository.MedicationRepositoryImpl
+import com.devoncats.meditrack.domain.usecase.ConfirmDoseUseCase
+import com.devoncats.meditrack.domain.usecase.PostponeDoseUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,25 +29,13 @@ class MedicationActionReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val database = MediTrackDatabase.getInstance(context)
-                val logDao = database.medicationLogDao()
-                val log = logDao.findById(logId)
-                if (log != null) {
-                    logDao.update(
-                        log.copy(confirmedAt = System.currentTimeMillis(), status = MedicationLogStatus.CONFIRMED)
-                    )
-                    if (scheduleId != -1L) {
-                        // Line up the next occurrence now that this dose is resolved; this
-                        // also supersedes the still-pending missed-dose check for this dose.
-                        database.scheduleDao().findById(scheduleId)?.let { schedule ->
-                            AlarmScheduler(context).schedule(
-                                scheduleId,
-                                log.medicationId,
-                                schedule.time.toLocalTime(),
-                                schedule.daysOfWeek.toWeekDays()
-                            )
-                        }
-                    }
-                }
+                val medicationRepository = MedicationRepositoryImpl(
+                    database.medicationDao(),
+                    database.scheduleDao(),
+                    database.medicationLogDao()
+                )
+                val confirmDoseUseCase = ConfirmDoseUseCase(medicationRepository, AlarmScheduler(context))
+                confirmDoseUseCase(logId, scheduleId)
                 NotificationManagerCompat.from(context).cancel(logId.toInt())
             } finally {
                 pendingResult.finish()
@@ -60,7 +48,8 @@ class MedicationActionReceiver : BroadcastReceiver() {
         val medicationId = intent.getLongExtra(EXTRA_MEDICATION_ID, -1L)
         if (scheduleId == -1L || medicationId == -1L) return
 
-        AlarmScheduler(context).postpone(scheduleId, medicationId, logId)
+        val postponeDoseUseCase = PostponeDoseUseCase(AlarmScheduler(context))
+        postponeDoseUseCase(scheduleId, medicationId, logId)
         NotificationManagerCompat.from(context).cancel(logId.toInt())
     }
 

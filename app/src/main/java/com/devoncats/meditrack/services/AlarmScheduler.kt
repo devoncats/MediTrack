@@ -9,10 +9,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.domain.model.WeekDays
-import com.devoncats.meditrack.utils.toLocalTime
-import com.devoncats.meditrack.utils.toWeekDays
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
@@ -51,13 +48,6 @@ class AlarmScheduler(private val context: Context) {
         val pendingIntent = pendingIntentFor(scheduleId, medicationId, logId)
         setExactAlarm(triggerAtMillis, pendingIntent)
         enqueueMissedDoseCheck(scheduleId, medicationId, triggerAtMillis)
-    }
-
-    suspend fun rescheduleAll() {
-        val scheduleDao = MediTrackDatabase.getInstance(context).scheduleDao()
-        scheduleDao.getAll().forEach { entity ->
-            schedule(entity.id, entity.medicationId, entity.time.toLocalTime(), entity.daysOfWeek.toWeekDays())
-        }
     }
 
     fun cancel(scheduleId: Long) {

@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.data.repository.MedicationRepositoryImpl
+import com.devoncats.meditrack.domain.usecase.ConfirmDoseUseCase
+import com.devoncats.meditrack.domain.usecase.PostponeDoseUseCase
 import com.devoncats.meditrack.services.AlarmScheduler
 
 class AlertViewModelFactory(context: Context, private val scheduleId: Long) : ViewModelProvider.Factory {
@@ -16,8 +18,10 @@ class AlertViewModelFactory(context: Context, private val scheduleId: Long) : Vi
         MediTrackDatabase.getInstance(appContext).medicationLogDao()
     )
     private val alarmScheduler = AlarmScheduler(appContext)
+    private val confirmDoseUseCase = ConfirmDoseUseCase(medicationRepository, alarmScheduler)
+    private val postponeDoseUseCase = PostponeDoseUseCase(alarmScheduler)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        AlertViewModel(medicationRepository, alarmScheduler, scheduleId) as T
+        AlertViewModel(medicationRepository, confirmDoseUseCase, postponeDoseUseCase, scheduleId) as T
 }

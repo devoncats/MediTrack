@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
+import com.devoncats.meditrack.domain.usecase.CreateSeniorPatientResult
+import com.devoncats.meditrack.domain.usecase.GeneratedCredentials
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 

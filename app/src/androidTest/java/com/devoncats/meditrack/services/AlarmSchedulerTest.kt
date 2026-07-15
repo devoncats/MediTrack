@@ -13,13 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.devoncats.meditrack.data.local.MediTrackDatabase
-import com.devoncats.meditrack.data.local.entity.MedicationEntity
-import com.devoncats.meditrack.data.local.entity.ScheduleEntity
-import com.devoncats.meditrack.data.local.entity.UserEntity
-import com.devoncats.meditrack.domain.model.UserRole
 import com.devoncats.meditrack.domain.model.WeekDays
-import com.devoncats.meditrack.utils.PasswordHasher
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.util.concurrent.CountDownLatch
@@ -67,55 +61,6 @@ class AlarmSchedulerTest {
         alarmScheduler.cancel(scheduleId)
 
         assertNull(existingPendingIntent(scheduleId))
-    }
-
-    @Test
-    fun rescheduleAll_reprogramsEveryScheduleFoundInRoom(): Unit = runBlocking {
-        val userDao = MediTrackDatabase.getInstance(context).userDao()
-        val username = "alarm-reschedule-test@meditrack.com"
-        userDao.findByUsername(username)?.let { userDao.delete(it) }
-        val userId = userDao.insert(
-            UserEntity(
-                name = "Reschedule Test User",
-                username = username,
-                passwordHash = PasswordHasher.hash("whatever123"),
-                role = UserRole.PATIENT,
-                caregiverId = null
-            )
-        )
-        val medicationDao = MediTrackDatabase.getInstance(context).medicationDao()
-        val medicationId = medicationDao.insert(
-            MedicationEntity(
-                name = "Test Med",
-                dose = "1",
-                frequency = "diaria",
-                instructions = null,
-                ownerUserId = userId,
-                photoUri = null,
-                createdAt = System.currentTimeMillis()
-            )
-        )
-        val scheduleDao = MediTrackDatabase.getInstance(context).scheduleDao()
-        val scheduleId1 = scheduleDao.insert(
-            ScheduleEntity(medicationId = medicationId, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
-        )
-        val scheduleId2 = scheduleDao.insert(
-            ScheduleEntity(medicationId = medicationId, time = "20:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
-        )
-
-        // Simulate the alarms having been cleared, e.g. by a device reboot.
-        alarmScheduler.cancel(scheduleId1)
-        alarmScheduler.cancel(scheduleId2)
-        assertNull(existingPendingIntent(scheduleId1))
-        assertNull(existingPendingIntent(scheduleId2))
-
-        alarmScheduler.rescheduleAll()
-
-        assertNotNull(existingPendingIntent(scheduleId1))
-        assertNotNull(existingPendingIntent(scheduleId2))
-
-        alarmScheduler.cancel(scheduleId1)
-        alarmScheduler.cancel(scheduleId2)
     }
 
     @Test

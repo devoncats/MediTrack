@@ -6,14 +6,16 @@ import androidx.lifecycle.ViewModelProvider
 import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.data.repository.UserRepositoryImpl
+import com.devoncats.meditrack.domain.usecase.LoginUseCase
 
 class LoginViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     private val appContext = context.applicationContext
     private val userRepository = UserRepositoryImpl(MediTrackDatabase.getInstance(appContext).userDao())
     private val sessionManager = SessionManager(appContext)
+    private val loginUseCase = LoginUseCase(userRepository, sessionManager)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        LoginViewModel(userRepository, sessionManager) as T
+        LoginViewModel(loginUseCase) as T
 }
