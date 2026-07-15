@@ -1,12 +1,12 @@
 package com.devoncats.meditrack.data.local.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.devoncats.meditrack.data.local.entity.UserEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
@@ -23,5 +23,5 @@ interface UserDao {
     suspend fun delete(user: UserEntity)
 
     @Query("SELECT * FROM users WHERE caregiverId = :caregiverId AND role = 'SENIOR_PATIENT' ORDER BY name ASC")
-    fun observeByCaregiverId(caregiverId: Long): LiveData<List<UserEntity>>
+    fun observeByCaregiverId(caregiverId: Long): Flow<List<UserEntity>>
 }

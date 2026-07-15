@@ -125,7 +125,7 @@ class SeniorAlertFragmentTest {
     }
 
     @Test
-    fun confirmingDose_updatesLogToConfirmedAndSupersedesTheMissedDoseWorkerWithTheNextOccurrence() {
+    fun confirmingDose_updatesLogToConfirmedAndSupersedesTheMissedDoseWorkerWithTheNextOccurrence(): Unit = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val workName = AlarmScheduler.missedDoseWorkName(scheduleId)
         val workManager = WorkManager.getInstance(context)
