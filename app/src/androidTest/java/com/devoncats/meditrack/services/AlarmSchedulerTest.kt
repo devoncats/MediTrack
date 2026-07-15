@@ -18,7 +18,10 @@ import com.devoncats.meditrack.data.local.entity.MedicationEntity
 import com.devoncats.meditrack.data.local.entity.ScheduleEntity
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.domain.model.WeekDays
 import com.devoncats.meditrack.utils.PasswordHasher
+import java.time.DayOfWeek
+import java.time.LocalTime
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -48,7 +51,7 @@ class AlarmSchedulerTest {
         val scheduleId = 4_001L
         alarmScheduler.cancel(scheduleId)
 
-        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = LocalTime.of(8, 0), daysOfWeek = WeekDays(DayOfWeek.entries.toSet()))
 
         assertNotNull(existingPendingIntent(scheduleId))
 
@@ -58,7 +61,7 @@ class AlarmSchedulerTest {
     @Test
     fun cancel_removesThePendingIntent() {
         val scheduleId = 4_002L
-        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = LocalTime.of(8, 0), daysOfWeek = WeekDays(DayOfWeek.entries.toSet()))
         assertNotNull(existingPendingIntent(scheduleId))
 
         alarmScheduler.cancel(scheduleId)
@@ -122,7 +125,7 @@ class AlarmSchedulerTest {
         val workManager = WorkManager.getInstance(context)
         alarmScheduler.cancel(scheduleId)
 
-        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = LocalTime.of(8, 0), daysOfWeek = WeekDays(DayOfWeek.entries.toSet()))
 
         val enqueuedInfos = workManager.getWorkInfosForUniqueWork(workName).get()
         assertTrue(

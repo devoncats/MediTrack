@@ -22,10 +22,13 @@ import com.devoncats.meditrack.data.local.entity.ScheduleEntity
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.domain.model.WeekDays
 import com.devoncats.meditrack.services.AlarmScheduler
 import com.devoncats.meditrack.services.MedicationAlarmReceiver
 import com.devoncats.meditrack.utils.PasswordHasher
 import java.io.File
+import java.time.DayOfWeek
+import java.time.LocalTime
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertFalse
@@ -219,7 +222,12 @@ class SeniorListFragmentTest {
                 status = MedicationLogStatus.MISSED
             )
         )
-        AlarmScheduler(context).schedule(scheduleId, medicationId, "08:00", "MON,TUE")
+        AlarmScheduler(context).schedule(
+            scheduleId,
+            medicationId,
+            LocalTime.of(8, 0),
+            WeekDays(setOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY))
+        )
         assertTrue("expected the photo file to exist before deletion", photoFile.exists())
         assertTrue(
             "expected the alarm to be armed before deletion",

@@ -14,6 +14,10 @@ import com.devoncats.meditrack.domain.model.MissedDoseAlert
 import com.devoncats.meditrack.domain.model.Schedule
 import com.devoncats.meditrack.domain.model.SeniorDoseStatus
 import com.devoncats.meditrack.domain.repository.MedicationRepository
+import com.devoncats.meditrack.utils.toCsv
+import com.devoncats.meditrack.utils.toHHmm
+import com.devoncats.meditrack.utils.toLocalTime
+import com.devoncats.meditrack.utils.toWeekDays
 
 class MedicationRepositoryImpl(
     private val medicationDao: MedicationDao,
@@ -139,15 +143,15 @@ class MedicationRepositoryImpl(
     private fun ScheduleEntity.toDomain() = Schedule(
         id = id,
         medicationId = medicationId,
-        time = time,
-        daysOfWeek = daysOfWeek
+        time = time.toLocalTime(),
+        daysOfWeek = daysOfWeek.toWeekDays()
     )
 
     private fun Schedule.toEntity() = ScheduleEntity(
         id = id,
         medicationId = medicationId,
-        time = time,
-        daysOfWeek = daysOfWeek
+        time = time.toHHmm(),
+        daysOfWeek = daysOfWeek.toCsv()
     )
 
     private fun MedicationLogEntity.toDomain() = MedicationLog(

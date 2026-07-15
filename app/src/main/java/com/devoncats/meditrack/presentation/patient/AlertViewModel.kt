@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.services.AlarmScheduler
+import com.devoncats.meditrack.utils.toHHmm
 import kotlinx.coroutines.launch
 
 data class AlertInfo(
@@ -42,7 +43,7 @@ class AlertViewModel(
                 medicationId = medication.id,
                 medicationName = medication.name,
                 dose = medication.dose,
-                scheduledTime = schedule.time
+                scheduledTime = schedule.time.toHHmm()
             )
         }
     }

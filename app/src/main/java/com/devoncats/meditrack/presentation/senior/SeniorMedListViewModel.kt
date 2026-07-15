@@ -10,6 +10,7 @@ import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.utils.DateUtils
+import com.devoncats.meditrack.utils.toHHmm
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -56,7 +57,7 @@ class SeniorMedListViewModel(
                         .filter { it.medicationId == medication.id }
                         .maxByOrNull { it.scheduledDatetime }
                     val schedules = medicationRepository.getSchedulesByMedication(medication.id)
-                    val scheduleSummary = schedules.map { it.time }.sorted().joinToString(", ")
+                    val scheduleSummary = schedules.map { it.time }.sorted().joinToString(", ") { it.toHHmm() }
                     SeniorMedicationItem(medication, latestLog?.status, scheduleSummary)
                 }
                 _medicationItems.value = items

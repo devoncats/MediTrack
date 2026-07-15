@@ -46,7 +46,7 @@ class SeniorListViewModel(
     ) { seniors, statuses ->
         seniors.map { senior ->
             val seniorStatuses = statuses.filter { it.seniorId == senior.id }.map { it.status }
-            SeniorListItem(senior, aggregateStatus(seniorStatuses))
+            SeniorListItem(senior, MedicationLogStatus.aggregate(seniorStatuses))
         }
     }
 
@@ -61,15 +61,6 @@ class SeniorListViewModel(
                 medication.photoUri?.takeIf { it.isNotBlank() }?.let { fileStorageHelper.deletePhoto(it) }
             }
             userRepository.delete(senior)
-        }
-    }
-
-    companion object {
-        internal fun aggregateStatus(statuses: List<MedicationLogStatus>): MedicationLogStatus? = when {
-            MedicationLogStatus.MISSED in statuses -> MedicationLogStatus.MISSED
-            MedicationLogStatus.PENDING in statuses -> MedicationLogStatus.PENDING
-            statuses.isNotEmpty() -> MedicationLogStatus.CONFIRMED
-            else -> null
         }
     }
 }

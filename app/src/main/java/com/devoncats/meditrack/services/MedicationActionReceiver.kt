@@ -6,6 +6,8 @@ import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
+import com.devoncats.meditrack.utils.toLocalTime
+import com.devoncats.meditrack.utils.toWeekDays
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,7 +39,12 @@ class MedicationActionReceiver : BroadcastReceiver() {
                         // Line up the next occurrence now that this dose is resolved; this
                         // also supersedes the still-pending missed-dose check for this dose.
                         database.scheduleDao().findById(scheduleId)?.let { schedule ->
-                            AlarmScheduler(context).schedule(scheduleId, log.medicationId, schedule.time, schedule.daysOfWeek)
+                            AlarmScheduler(context).schedule(
+                                scheduleId,
+                                log.medicationId,
+                                schedule.time.toLocalTime(),
+                                schedule.daysOfWeek.toWeekDays()
+                            )
                         }
                     }
                 }

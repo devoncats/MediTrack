@@ -7,11 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.Schedule
+import com.devoncats.meditrack.domain.model.WeekDays
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.services.AlarmScheduler
 import com.devoncats.meditrack.services.FileStorageHelper
-import com.devoncats.meditrack.utils.toCode
-import com.devoncats.meditrack.utils.toDayOfWeekOrNull
 import java.time.DayOfWeek
 import java.time.LocalTime
 import kotlinx.coroutines.launch
@@ -52,12 +51,8 @@ class MedFormViewModel(
             viewModelScope.launch {
                 val medication = medicationRepository.getMedicationById(medicationId) ?: return@launch
                 val schedules = medicationRepository.getSchedulesByMedication(medicationId)
-                val days = schedules.firstOrNull()?.daysOfWeek
-                    ?.split(",")
-                    ?.mapNotNull { it.toDayOfWeekOrNull() }
-                    ?.toSet()
-                    .orEmpty()
-                val times = schedules.mapNotNull { runCatching { LocalTime.parse(it.time) }.getOrNull() }
+                val days = schedules.firstOrNull()?.daysOfWeek?.days.orEmpty()
+                val times = schedules.map { it.time }
 
                 _prefill.value = MedFormPrefill(
                     name = medication.name,
@@ -131,13 +126,12 @@ class MedFormViewModel(
                 }
             }
 
-            val daysOfWeek = selectedDays.joinToString(",") { it.toCode() }
+            val weekDays = WeekDays(selectedDays)
             selectedTimes.forEach { time ->
-                val timeString = "%02d:%02d".format(time.hour, time.minute)
                 val scheduleId = medicationRepository.insertSchedule(
-                    Schedule(id = 0, medicationId = resolvedMedicationId, time = timeString, daysOfWeek = daysOfWeek)
+                    Schedule(id = 0, medicationId = resolvedMedicationId, time = time, daysOfWeek = weekDays)
                 )
-                alarmScheduler.schedule(scheduleId, resolvedMedicationId, timeString, daysOfWeek)
+                alarmScheduler.schedule(scheduleId, resolvedMedicationId, time, weekDays)
             }
 
             _saveResult.value = MedFormSaveResult.Success

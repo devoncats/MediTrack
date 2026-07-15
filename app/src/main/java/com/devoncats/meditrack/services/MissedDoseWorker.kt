@@ -6,6 +6,8 @@ import androidx.work.WorkerParameters
 import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.utils.toLocalTime
+import com.devoncats.meditrack.utils.toWeekDays
 
 class MissedDoseWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -42,7 +44,12 @@ class MissedDoseWorker(context: Context, params: WorkerParameters) : CoroutineWo
         // AlarmManager only ever holds this schedule's next single trigger, so whether this
         // dose just got marked missed or had already been confirmed, line up the next
         // occurrence (and its paired missed-dose check) now that this one is resolved.
-        AlarmScheduler(applicationContext).schedule(scheduleId, medicationId, schedule.time, schedule.daysOfWeek)
+        AlarmScheduler(applicationContext).schedule(
+            scheduleId,
+            medicationId,
+            schedule.time.toLocalTime(),
+            schedule.daysOfWeek.toWeekDays()
+        )
 
         return Result.success()
     }
