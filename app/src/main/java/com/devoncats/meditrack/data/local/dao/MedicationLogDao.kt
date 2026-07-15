@@ -24,10 +24,10 @@ interface MedicationLogDao {
     suspend fun findById(id: Long): MedicationLogEntity?
 
     @Query(
-        "SELECT * FROM medication_logs WHERE medicationId = :medicationId AND status = 'PENDING' " +
+        "SELECT * FROM medication_logs WHERE scheduleId = :scheduleId AND status = 'PENDING' " +
             "ORDER BY scheduledDatetime DESC LIMIT 1"
     )
-    suspend fun findLatestPendingByMedication(medicationId: Long): MedicationLogEntity?
+    suspend fun findLatestPendingBySchedule(scheduleId: Long): MedicationLogEntity?
 
     @Query("SELECT * FROM medication_logs WHERE medicationId = :medicationId ORDER BY scheduledDatetime DESC")
     fun observeByMedication(medicationId: Long): LiveData<List<MedicationLogEntity>>

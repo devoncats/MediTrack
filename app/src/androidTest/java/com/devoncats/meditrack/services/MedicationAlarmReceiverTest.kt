@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.data.local.entity.MedicationEntity
+import com.devoncats.meditrack.data.local.entity.ScheduleEntity
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.UserRole
@@ -60,9 +61,11 @@ class MedicationAlarmReceiverTest {
     }
 
     @Test
-    fun onReceive_createsPendingLogAndShowsNotificationWithNameAndDose() {
+    fun onReceive_createsPendingLogAndShowsNotificationWithNameAndDose(): Unit = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val scheduleId = 5_001L
+        val scheduleId = MediTrackDatabase.getInstance(context).scheduleDao().insert(
+            ScheduleEntity(medicationId = medicationId, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        )
 
         val intent = Intent(context, MedicationAlarmReceiver::class.java).apply {
             putExtra(AlarmScheduler.EXTRA_MEDICATION_ID, medicationId)
@@ -120,7 +123,9 @@ class MedicationAlarmReceiverTest {
                 createdAt = System.currentTimeMillis()
             )
         )
-        val scheduleId = 5_002L
+        val scheduleId = MediTrackDatabase.getInstance(context).scheduleDao().insert(
+            ScheduleEntity(medicationId = seniorMedicationId, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        )
 
         val intent = Intent(context, MedicationAlarmReceiver::class.java).apply {
             putExtra(AlarmScheduler.EXTRA_MEDICATION_ID, seniorMedicationId)
@@ -144,5 +149,47 @@ class MedicationAlarmReceiverTest {
         assertEquals(1, activeNotification!!.notification.actions?.size)
 
         notificationManager.cancel(activeNotification.id)
+    }
+
+    @Test
+    fun onReceive_forAPostponedRepeat_reusesTheExistingLogInsteadOfDuplicatingIt(): Unit = runBlocking {
+        // Regression test: postponing must not leave the original log stuck PENDING forever
+        // while a second log gets created for the same dose.
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val scheduleId = MediTrackDatabase.getInstance(context).scheduleDao().insert(
+            ScheduleEntity(medicationId = medicationId, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        )
+        val logDao = MediTrackDatabase.getInstance(context).medicationLogDao()
+
+        val originalIntent = Intent(context, MedicationAlarmReceiver::class.java).apply {
+            putExtra(AlarmScheduler.EXTRA_MEDICATION_ID, medicationId)
+            putExtra(AlarmScheduler.EXTRA_SCHEDULE_ID, scheduleId)
+        }
+        context.sendBroadcast(originalIntent)
+        Thread.sleep(1000)
+
+        val logsAfterOriginalFire = logDao.observeByMedication(medicationId).getOrAwaitValue()
+        assertEquals(1, logsAfterOriginalFire?.size)
+        val originalLogId = logsAfterOriginalFire!!.first().id
+
+        val postponedIntent = Intent(context, MedicationAlarmReceiver::class.java).apply {
+            putExtra(AlarmScheduler.EXTRA_MEDICATION_ID, medicationId)
+            putExtra(AlarmScheduler.EXTRA_SCHEDULE_ID, scheduleId)
+            putExtra(AlarmScheduler.EXTRA_LOG_ID, originalLogId)
+        }
+        context.sendBroadcast(postponedIntent)
+        Thread.sleep(1000)
+
+        val logsAfterPostponedFire = logDao.observeByMedication(medicationId).getOrAwaitValue()
+        assertEquals(
+            "expected no duplicate log to be created for the postponed repeat",
+            1,
+            logsAfterPostponedFire?.size
+        )
+        assertEquals(originalLogId, logsAfterPostponedFire!!.first().id)
+        assertEquals(MedicationLogStatus.PENDING, logsAfterPostponedFire.first().status)
+
+        val notificationManager = context.getSystemService(NotificationManager::class.java)
+        notificationManager.cancel(originalLogId.toInt())
     }
 }

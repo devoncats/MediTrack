@@ -32,9 +32,17 @@ class AlarmScheduler(private val context: Context) {
         enqueueMissedDoseCheck(scheduleId, medicationId, triggerAtMillis)
     }
 
-    fun postpone(scheduleId: Long, medicationId: Long, minutes: Long = POSTPONE_MINUTES, now: LocalDateTime = LocalDateTime.now()) {
+    fun postpone(
+        scheduleId: Long,
+        medicationId: Long,
+        logId: Long,
+        minutes: Long = POSTPONE_MINUTES,
+        now: LocalDateTime = LocalDateTime.now()
+    ) {
         val triggerAtMillis = postponeTriggerMillis(now, minutes)
-        val pendingIntent = pendingIntentFor(scheduleId, medicationId)
+        // Carrying the original logId lets MedicationAlarmReceiver recognize this re-fire
+        // as a reminder repeat and reuse the existing log instead of inserting a duplicate.
+        val pendingIntent = pendingIntentFor(scheduleId, medicationId, logId)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
         } else {
@@ -62,24 +70,26 @@ class AlarmScheduler(private val context: Context) {
         workManager.cancelUniqueWork(missedDoseWorkName(scheduleId))
     }
 
-    fun cancelMissedDoseCheck(scheduleId: Long) {
-        workManager.cancelUniqueWork(missedDoseWorkName(scheduleId))
-    }
-
     private fun enqueueMissedDoseCheck(scheduleId: Long, medicationId: Long, triggerAtMillis: Long) {
         val delayMillis = (triggerAtMillis - System.currentTimeMillis()) +
             TimeUnit.MINUTES.toMillis(MISSED_DOSE_CHECK_DELAY_MINUTES)
         val request = OneTimeWorkRequestBuilder<MissedDoseWorker>()
             .setInitialDelay(delayMillis.coerceAtLeast(0), TimeUnit.MILLISECONDS)
-            .setInputData(workDataOf(MissedDoseWorker.KEY_MEDICATION_ID to medicationId))
+            .setInputData(
+                workDataOf(
+                    MissedDoseWorker.KEY_MEDICATION_ID to medicationId,
+                    MissedDoseWorker.KEY_SCHEDULE_ID to scheduleId
+                )
+            )
             .build()
         workManager.enqueueUniqueWork(missedDoseWorkName(scheduleId), ExistingWorkPolicy.REPLACE, request)
     }
 
-    private fun pendingIntentFor(scheduleId: Long, medicationId: Long): PendingIntent {
+    private fun pendingIntentFor(scheduleId: Long, medicationId: Long, logId: Long? = null): PendingIntent {
         val intent = Intent(context, MedicationAlarmReceiver::class.java).apply {
             putExtra(EXTRA_SCHEDULE_ID, scheduleId)
             putExtra(EXTRA_MEDICATION_ID, medicationId)
+            if (logId != null) putExtra(EXTRA_LOG_ID, logId)
         }
         return PendingIntent.getBroadcast(
             context,
@@ -92,6 +102,7 @@ class AlarmScheduler(private val context: Context) {
     companion object {
         const val EXTRA_SCHEDULE_ID = "scheduleId"
         const val EXTRA_MEDICATION_ID = "medicationId"
+        const val EXTRA_LOG_ID = "logId"
         const val POSTPONE_MINUTES = 15L
         const val MISSED_DOSE_CHECK_DELAY_MINUTES = 30L
 

@@ -80,6 +80,7 @@ class SeniorAlertFragmentTest {
         MediTrackDatabase.getInstance(context).medicationLogDao().insert(
             MedicationLogEntity(
                 medicationId = medicationId,
+                scheduleId = scheduleId,
                 scheduledDatetime = System.currentTimeMillis(),
                 confirmedAt = null,
                 status = MedicationLogStatus.PENDING
@@ -121,7 +122,7 @@ class SeniorAlertFragmentTest {
     }
 
     @Test
-    fun confirmingDose_updatesLogToConfirmedAndCancelsTheMissedDoseWorker() {
+    fun confirmingDose_updatesLogToConfirmedAndSupersedesTheMissedDoseWorkerWithTheNextOccurrence() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val workName = AlarmScheduler.missedDoseWorkName(scheduleId)
         val workManager = WorkManager.getInstance(context)
@@ -131,6 +132,7 @@ class SeniorAlertFragmentTest {
             "expected an enqueued missed-dose check work before confirming",
             enqueuedInfos.any { it.state == WorkInfo.State.ENQUEUED }
         )
+        val originalWorkId = enqueuedInfos.first { it.state == WorkInfo.State.ENQUEUED }.id
 
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             navigateToAlert(scenario)
@@ -146,10 +148,20 @@ class SeniorAlertFragmentTest {
             .observeByMedication(medicationId).getOrAwaitValue()
         assertEquals(MedicationLogStatus.CONFIRMED, logs?.firstOrNull()?.status)
 
+        // Confirming resolves today's dose (superseding the original check work) and, per the
+        // fix for the alarm not recurring, immediately arms the next occurrence's own check.
+        // ExistingWorkPolicy.REPLACE drops the superseded WorkSpec outright, so the original
+        // work id no longer shows up at all — a fresh, different id must be enqueued instead.
         val afterConfirmInfos = workManager.getWorkInfosForUniqueWork(workName).get()
         assertTrue(
-            "expected the missed-dose check work to be cancelled after confirming",
-            afterConfirmInfos.all { it.state.isFinished }
+            "expected the original missed-dose check work to no longer be enqueued",
+            afterConfirmInfos.none { it.id == originalWorkId && it.state == WorkInfo.State.ENQUEUED }
         )
+        assertTrue(
+            "expected a freshly armed missed-dose check for the next occurrence",
+            afterConfirmInfos.any { it.id != originalWorkId && it.state == WorkInfo.State.ENQUEUED }
+        )
+
+        AlarmScheduler(context).cancel(scheduleId)
     }
 }

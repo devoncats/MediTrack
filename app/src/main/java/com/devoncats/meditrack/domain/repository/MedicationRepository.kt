@@ -26,7 +26,7 @@ interface MedicationRepository {
     suspend fun updateLog(log: MedicationLog)
     suspend fun deleteLog(log: MedicationLog)
     suspend fun getLogById(id: Long): MedicationLog?
-    suspend fun getLatestPendingLogForMedication(medicationId: Long): MedicationLog?
+    suspend fun getLatestPendingLogForSchedule(scheduleId: Long): MedicationLog?
     fun observeLogsByMedication(medicationId: Long): LiveData<List<MedicationLog>>
     fun observeLogsByOwnerBetween(ownerUserId: Long, startInclusive: Long, endExclusive: Long): LiveData<List<MedicationLog>>
     fun observeMissedDoseAlertsForCaregiver(caregiverId: Long): LiveData<List<MissedDoseAlert>>

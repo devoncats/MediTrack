@@ -15,6 +15,9 @@ class MedicationAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val medicationId = intent.getLongExtra(AlarmScheduler.EXTRA_MEDICATION_ID, -1L)
         val scheduleId = intent.getLongExtra(AlarmScheduler.EXTRA_SCHEDULE_ID, -1L)
+        // Present only when this fire is a postponed repeat of an already-shown reminder
+        // (see AlarmScheduler.postpone); absent on the original scheduled fire.
+        val postponedLogId = intent.getLongExtra(AlarmScheduler.EXTRA_LOG_ID, -1L).takeIf { it != -1L }
         if (medicationId == -1L || scheduleId == -1L) return
 
         val pendingResult = goAsync()
@@ -23,14 +26,26 @@ class MedicationAlarmReceiver : BroadcastReceiver() {
                 val database = MediTrackDatabase.getInstance(context)
                 val medication = database.medicationDao().findById(medicationId)
                 if (medication != null) {
-                    val logId = database.medicationLogDao().insert(
-                        MedicationLogEntity(
-                            medicationId = medicationId,
-                            scheduledDatetime = System.currentTimeMillis(),
-                            confirmedAt = null,
-                            status = MedicationLogStatus.PENDING
+                    val logDao = database.medicationLogDao()
+                    val logId = if (postponedLogId != null) {
+                        val existingLog = logDao.findById(postponedLogId)
+                        // Dose was confirmed while the postponed alarm was in flight, or the
+                        // log no longer exists: nothing to remind about anymore.
+                        if (existingLog == null || existingLog.status != MedicationLogStatus.PENDING) {
+                            return@launch
+                        }
+                        postponedLogId
+                    } else {
+                        logDao.insert(
+                            MedicationLogEntity(
+                                medicationId = medicationId,
+                                scheduleId = scheduleId,
+                                scheduledDatetime = System.currentTimeMillis(),
+                                confirmedAt = null,
+                                status = MedicationLogStatus.PENDING
+                            )
                         )
-                    )
+                    }
                     val owner = database.userDao().findById(medication.ownerUserId)
                     NotificationHelper(context).showMedicationAlarmNotification(
                         logId = logId,

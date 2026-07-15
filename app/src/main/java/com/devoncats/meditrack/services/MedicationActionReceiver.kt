@@ -16,21 +16,30 @@ class MedicationActionReceiver : BroadcastReceiver() {
         if (logId == -1L) return
 
         when (intent.action) {
-            ACTION_CONFIRM -> confirmDose(context, logId)
+            ACTION_CONFIRM -> confirmDose(context, intent, logId)
             ACTION_POSTPONE -> postponeDose(context, intent, logId)
         }
     }
 
-    private fun confirmDose(context: Context, logId: Long) {
+    private fun confirmDose(context: Context, intent: Intent, logId: Long) {
+        val scheduleId = intent.getLongExtra(EXTRA_SCHEDULE_ID, -1L)
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val logDao = MediTrackDatabase.getInstance(context).medicationLogDao()
+                val database = MediTrackDatabase.getInstance(context)
+                val logDao = database.medicationLogDao()
                 val log = logDao.findById(logId)
                 if (log != null) {
                     logDao.update(
                         log.copy(confirmedAt = System.currentTimeMillis(), status = MedicationLogStatus.CONFIRMED)
                     )
+                    if (scheduleId != -1L) {
+                        // Line up the next occurrence now that this dose is resolved; this
+                        // also supersedes the still-pending missed-dose check for this dose.
+                        database.scheduleDao().findById(scheduleId)?.let { schedule ->
+                            AlarmScheduler(context).schedule(scheduleId, log.medicationId, schedule.time, schedule.daysOfWeek)
+                        }
+                    }
                 }
                 NotificationManagerCompat.from(context).cancel(logId.toInt())
             } finally {
@@ -44,7 +53,7 @@ class MedicationActionReceiver : BroadcastReceiver() {
         val medicationId = intent.getLongExtra(EXTRA_MEDICATION_ID, -1L)
         if (scheduleId == -1L || medicationId == -1L) return
 
-        AlarmScheduler(context).postpone(scheduleId, medicationId)
+        AlarmScheduler(context).postpone(scheduleId, medicationId, logId)
         NotificationManagerCompat.from(context).cancel(logId.toInt())
     }
 
