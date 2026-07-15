@@ -69,10 +69,15 @@ class MedicationActionReceiverTest {
 
     @Test
     fun confirmAction_updatesLogToConfirmedAndCancelsNotification(): Unit = runBlocking {
+        val scheduleId = MediTrackDatabase.getInstance(context).scheduleDao().insert(
+            ScheduleEntity(medicationId = medicationId, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        )
+        AlarmScheduler(context).cancel(scheduleId)
         val logDao = MediTrackDatabase.getInstance(context).medicationLogDao()
         val logId = logDao.insert(
             MedicationLogEntity(
                 medicationId = medicationId,
+                scheduleId = scheduleId,
                 scheduledDatetime = System.currentTimeMillis(),
                 confirmedAt = null,
                 status = MedicationLogStatus.PENDING
@@ -81,7 +86,7 @@ class MedicationActionReceiverTest {
         val notificationManager = context.getSystemService(NotificationManager::class.java)
         NotificationHelper(context).showMedicationAlarmNotification(
             logId = logId,
-            scheduleId = 1L,
+            scheduleId = scheduleId,
             medicationId = medicationId,
             medicationName = "Paracetamol",
             dose = "500mg"
@@ -90,6 +95,7 @@ class MedicationActionReceiverTest {
         val intent = Intent(context, MedicationActionReceiver::class.java).apply {
             action = MedicationActionReceiver.ACTION_CONFIRM
             putExtra(MedicationActionReceiver.EXTRA_LOG_ID, logId)
+            putExtra(MedicationActionReceiver.EXTRA_SCHEDULE_ID, scheduleId)
         }
         context.sendBroadcast(intent)
 
@@ -101,6 +107,12 @@ class MedicationActionReceiverTest {
 
         val stillActive = notificationManager.activeNotifications.any { it.id == logId.toInt() }
         assertTrue("notification should have been cancelled", !stillActive)
+
+        // Confirming via the notification action must also arm the next occurrence
+        // (fix for the alarm not recurring after firing once).
+        assertNotNull("expected the next occurrence to be armed", existingAlarmPendingIntent(scheduleId))
+
+        AlarmScheduler(context).cancel(scheduleId)
     }
 
     @Test

@@ -18,6 +18,11 @@ class MedListFragment : Fragment(R.layout.fragment_med_list) {
         MedListViewModelFactory(requireContext())
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshTodayRange()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

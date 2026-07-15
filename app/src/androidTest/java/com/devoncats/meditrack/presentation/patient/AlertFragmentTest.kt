@@ -78,6 +78,7 @@ class AlertFragmentTest {
         logId = MediTrackDatabase.getInstance(context).medicationLogDao().insert(
             MedicationLogEntity(
                 medicationId = medicationId,
+                scheduleId = scheduleId,
                 scheduledDatetime = System.currentTimeMillis(),
                 confirmedAt = null,
                 status = MedicationLogStatus.PENDING
@@ -123,6 +124,9 @@ class AlertFragmentTest {
             assertEquals(MedicationLogStatus.CONFIRMED, log?.status)
             assertNotNull(log?.confirmedAt)
         }
+
+        // Confirming now arms the next occurrence (fix for the alarm not recurring); clean it up.
+        AlarmScheduler(InstrumentationRegistry.getInstrumentation().targetContext).cancel(scheduleId)
     }
 
     @Test

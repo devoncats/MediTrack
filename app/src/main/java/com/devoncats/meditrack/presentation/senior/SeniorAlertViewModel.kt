@@ -37,7 +37,7 @@ class SeniorAlertViewModel(
         viewModelScope.launch {
             val schedule = medicationRepository.getScheduleById(scheduleId) ?: return@launch
             val medication = medicationRepository.getMedicationById(schedule.medicationId) ?: return@launch
-            val log = medicationRepository.getLatestPendingLogForMedication(medication.id) ?: return@launch
+            val log = medicationRepository.getLatestPendingLogForSchedule(scheduleId) ?: return@launch
 
             logId = log.id
             _alertInfo.value = SeniorAlertInfo(
@@ -55,7 +55,11 @@ class SeniorAlertViewModel(
             medicationRepository.updateLog(
                 log.copy(confirmedAt = System.currentTimeMillis(), status = MedicationLogStatus.CONFIRMED)
             )
-            alarmScheduler.cancelMissedDoseCheck(scheduleId)
+            // Line up the next occurrence now that this dose is resolved; this also
+            // supersedes the still-pending missed-dose check for this dose.
+            medicationRepository.getScheduleById(scheduleId)?.let { schedule ->
+                alarmScheduler.schedule(scheduleId, log.medicationId, schedule.time, schedule.daysOfWeek)
+            }
             _actionResult.value = SeniorAlertActionResult.Confirmed
         }
     }

@@ -11,6 +11,7 @@ import androidx.work.workDataOf
 import com.devoncats.meditrack.data.local.MediTrackDatabase
 import com.devoncats.meditrack.data.local.entity.MedicationEntity
 import com.devoncats.meditrack.data.local.entity.MedicationLogEntity
+import com.devoncats.meditrack.data.local.entity.ScheduleEntity
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.UserRole
@@ -59,6 +60,11 @@ class MissedDoseWorkerTest {
         return userId to medicationId
     }
 
+    private suspend fun seedSchedule(medicationId: Long): Long =
+        MediTrackDatabase.getInstance(context).scheduleDao().insert(
+            ScheduleEntity(medicationId = medicationId, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        )
+
     @Test
     fun doWork_marksPendingLogAsMissed_forPatientOwner(): Unit = runBlocking {
         val (_, medicationId) = seedUserAndMedication(
@@ -66,9 +72,11 @@ class MissedDoseWorkerTest {
             UserRole.PATIENT,
             "Patient Owner"
         )
+        val scheduleId = seedSchedule(medicationId)
         val logId = MediTrackDatabase.getInstance(context).medicationLogDao().insert(
             MedicationLogEntity(
                 medicationId = medicationId,
+                scheduleId = scheduleId,
                 scheduledDatetime = System.currentTimeMillis(),
                 confirmedAt = null,
                 status = MedicationLogStatus.PENDING
@@ -76,7 +84,12 @@ class MissedDoseWorkerTest {
         )
 
         val worker = TestListenableWorkerBuilder<MissedDoseWorker>(context)
-            .setInputData(workDataOf(MissedDoseWorker.KEY_MEDICATION_ID to medicationId))
+            .setInputData(
+                workDataOf(
+                    MissedDoseWorker.KEY_MEDICATION_ID to medicationId,
+                    MissedDoseWorker.KEY_SCHEDULE_ID to scheduleId
+                )
+            )
             .build()
 
         val result = worker.startWork().get()
@@ -84,6 +97,8 @@ class MissedDoseWorkerTest {
         assertTrue(result is ListenableWorker.Result.Success)
         val log = MediTrackDatabase.getInstance(context).medicationLogDao().findById(logId)
         assertEquals(MedicationLogStatus.MISSED, log?.status)
+
+        AlarmScheduler(context).cancel(scheduleId)
     }
 
     @Test
@@ -93,9 +108,11 @@ class MissedDoseWorkerTest {
             UserRole.SENIOR_PATIENT,
             "Abuela Rosa"
         )
+        val scheduleId = seedSchedule(medicationId)
         MediTrackDatabase.getInstance(context).medicationLogDao().insert(
             MedicationLogEntity(
                 medicationId = medicationId,
+                scheduleId = scheduleId,
                 scheduledDatetime = System.currentTimeMillis(),
                 confirmedAt = null,
                 status = MedicationLogStatus.PENDING
@@ -103,7 +120,12 @@ class MissedDoseWorkerTest {
         )
 
         val worker = TestListenableWorkerBuilder<MissedDoseWorker>(context)
-            .setInputData(workDataOf(MissedDoseWorker.KEY_MEDICATION_ID to medicationId))
+            .setInputData(
+                workDataOf(
+                    MissedDoseWorker.KEY_MEDICATION_ID to medicationId,
+                    MissedDoseWorker.KEY_SCHEDULE_ID to scheduleId
+                )
+            )
             .build()
 
         worker.startWork().get()
@@ -114,6 +136,7 @@ class MissedDoseWorkerTest {
         assertTrue("expected a missed-dose notification for the caregiver", posted)
 
         notificationManager.cancel(notificationId)
+        AlarmScheduler(context).cancel(scheduleId)
     }
 
     @Test
@@ -123,13 +146,76 @@ class MissedDoseWorkerTest {
             UserRole.PATIENT,
             "No Log Owner"
         )
+        val scheduleId = seedSchedule(medicationId)
 
         val worker = TestListenableWorkerBuilder<MissedDoseWorker>(context)
-            .setInputData(workDataOf(MissedDoseWorker.KEY_MEDICATION_ID to medicationId))
+            .setInputData(
+                workDataOf(
+                    MissedDoseWorker.KEY_MEDICATION_ID to medicationId,
+                    MissedDoseWorker.KEY_SCHEDULE_ID to scheduleId
+                )
+            )
             .build()
 
         val result = worker.startWork().get()
 
         assertTrue(result is ListenableWorker.Result.Success)
+
+        AlarmScheduler(context).cancel(scheduleId)
+    }
+
+    @Test
+    fun doWork_onlyEvaluatesThePendingLogForItsOwnSchedule(): Unit = runBlocking {
+        // Regression test for a medication with two schedules close together: the worker
+        // for one schedule must never mark the other schedule's still-on-time dose as missed.
+        val (_, medicationId) = seedUserAndMedication(
+            "missed-worker-multi-schedule@meditrack.com",
+            UserRole.PATIENT,
+            "Multi Schedule Owner"
+        )
+        val morningScheduleId = seedSchedule(medicationId)
+        val eveningScheduleId = MediTrackDatabase.getInstance(context).scheduleDao().insert(
+            ScheduleEntity(medicationId = medicationId, time = "20:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        )
+        val logDao = MediTrackDatabase.getInstance(context).medicationLogDao()
+        val morningLogId = logDao.insert(
+            MedicationLogEntity(
+                medicationId = medicationId,
+                scheduleId = morningScheduleId,
+                scheduledDatetime = System.currentTimeMillis(),
+                confirmedAt = null,
+                status = MedicationLogStatus.PENDING
+            )
+        )
+        val eveningLogId = logDao.insert(
+            MedicationLogEntity(
+                medicationId = medicationId,
+                scheduleId = eveningScheduleId,
+                scheduledDatetime = System.currentTimeMillis(),
+                confirmedAt = null,
+                status = MedicationLogStatus.PENDING
+            )
+        )
+
+        val worker = TestListenableWorkerBuilder<MissedDoseWorker>(context)
+            .setInputData(
+                workDataOf(
+                    MissedDoseWorker.KEY_MEDICATION_ID to medicationId,
+                    MissedDoseWorker.KEY_SCHEDULE_ID to morningScheduleId
+                )
+            )
+            .build()
+
+        worker.startWork().get()
+
+        assertEquals(MedicationLogStatus.MISSED, logDao.findById(morningLogId)?.status)
+        assertEquals(
+            "the evening schedule's still-pending dose must not be touched",
+            MedicationLogStatus.PENDING,
+            logDao.findById(eveningLogId)?.status
+        )
+
+        AlarmScheduler(context).cancel(morningScheduleId)
+        AlarmScheduler(context).cancel(eveningScheduleId)
     }
 }

@@ -43,7 +43,7 @@ class NotificationHelper(private val context: Context) {
             .addAction(
                 R.drawable.ic_lucide_check_circle,
                 context.getString(R.string.notification_action_confirm),
-                confirmActionPendingIntent(logId)
+                confirmActionPendingIntent(logId, scheduleId)
             )
 
         if (!isSeniorPatient) {
@@ -80,10 +80,11 @@ class NotificationHelper(private val context: Context) {
         NotificationManagerCompat.from(context).notify(MISSED_DOSE_NOTIFICATION_ID_OFFSET + medicationId.toInt(), notification)
     }
 
-    private fun confirmActionPendingIntent(logId: Long): PendingIntent {
+    private fun confirmActionPendingIntent(logId: Long, scheduleId: Long): PendingIntent {
         val intent = Intent(context, MedicationActionReceiver::class.java).apply {
             action = MedicationActionReceiver.ACTION_CONFIRM
             putExtra(MedicationActionReceiver.EXTRA_LOG_ID, logId)
+            putExtra(MedicationActionReceiver.EXTRA_SCHEDULE_ID, scheduleId)
         }
         return PendingIntent.getBroadcast(
             context,

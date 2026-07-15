@@ -88,4 +88,24 @@ class MainActivitySessionTest {
             assertFalse(sessionManager.isLoggedIn())
         }
     }
+
+    @Test
+    fun recreatingTheActivity_doesNotResetNavigationBackToTheRoleGraphStart() {
+        // Regression test: a config change (e.g. rotation) recreates the Activity, which used
+        // to unconditionally re-run the session redirect and reset the back stack.
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val user = runBlocking { MediTrackDatabase.getInstance(context).userDao().findByEmail(testEmail)!! }
+        sessionManager.saveSession(user.id, UserRole.PATIENT.name)
+
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            onView(withId(R.id.medListTitle)).check(matches(isDisplayed()))
+
+            onView(withId(R.id.addMedicationFab)).perform(click())
+            onView(withId(R.id.medFormTitle)).check(matches(isDisplayed()))
+
+            scenario.recreate()
+
+            onView(withId(R.id.medFormTitle)).check(matches(isDisplayed()))
+        }
+    }
 }

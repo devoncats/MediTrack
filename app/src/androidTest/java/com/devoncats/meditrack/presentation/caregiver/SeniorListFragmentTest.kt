@@ -1,5 +1,7 @@
 package com.devoncats.meditrack.presentation.caregiver
 
+import android.app.PendingIntent
+import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -20,9 +22,13 @@ import com.devoncats.meditrack.data.local.entity.ScheduleEntity
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.services.AlarmScheduler
+import com.devoncats.meditrack.services.MedicationAlarmReceiver
 import com.devoncats.meditrack.utils.PasswordHasher
+import java.io.File
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -158,6 +164,14 @@ class SeniorListFragmentTest {
         }
     }
 
+    private fun existingAlarmPendingIntent(context: android.content.Context, scheduleId: Long): PendingIntent? =
+        PendingIntent.getBroadcast(
+            context,
+            scheduleId.toInt(),
+            Intent(context, MedicationAlarmReceiver::class.java),
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+
     @Test
     fun deleteSenior_withConfirmation_cascadesMedicationsSchedulesAndLogs(): Unit = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -175,6 +189,14 @@ class SeniorListFragmentTest {
                 caregiverId = caregiverId
             )
         )
+        // A real photo file and a real armed alarm, so we can verify the ViewModel tears down
+        // the state that lives *outside* Room (files on disk, AlarmManager/WorkManager) too —
+        // CASCADE alone only cleans up DB rows.
+        val photosDir = File(context.filesDir, "medications").apply { mkdirs() }
+        val photoFile = File(photosDir, "senior_delete_test_photo.jpg")
+        photoFile.writeBytes(byteArrayOf(1, 2, 3))
+        val photoUri = "medications/${photoFile.name}"
+
         val medicationId = medicationDao.insert(
             MedicationEntity(
                 name = "Senior Delete Medication",
@@ -182,7 +204,7 @@ class SeniorListFragmentTest {
                 frequency = "Cada 8 horas",
                 instructions = null,
                 ownerUserId = seniorId,
-                photoUri = null,
+                photoUri = photoUri,
                 createdAt = System.currentTimeMillis()
             )
         )
@@ -196,6 +218,12 @@ class SeniorListFragmentTest {
                 confirmedAt = null,
                 status = MedicationLogStatus.MISSED
             )
+        )
+        AlarmScheduler(context).schedule(scheduleId, medicationId, "08:00", "MON,TUE")
+        assertTrue("expected the photo file to exist before deletion", photoFile.exists())
+        assertTrue(
+            "expected the alarm to be armed before deletion",
+            existingAlarmPendingIntent(context, scheduleId) != null
         )
 
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
@@ -215,5 +243,10 @@ class SeniorListFragmentTest {
         assertNull(medicationDao.findById(medicationId))
         assertNull(scheduleDao.findById(scheduleId))
         assertNull(medicationLogDao.findById(logId))
+        assertFalse("expected the photo file to be deleted", photoFile.exists())
+        assertNull(
+            "expected the alarm to be cancelled",
+            existingAlarmPendingIntent(context, scheduleId)
+        )
     }
 }

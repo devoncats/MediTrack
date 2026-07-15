@@ -39,7 +39,7 @@ class AlertViewModel(
         viewModelScope.launch {
             val schedule = medicationRepository.getScheduleById(scheduleId) ?: return@launch
             val medication = medicationRepository.getMedicationById(schedule.medicationId) ?: return@launch
-            val log = medicationRepository.getLatestPendingLogForMedication(medication.id) ?: return@launch
+            val log = medicationRepository.getLatestPendingLogForSchedule(scheduleId) ?: return@launch
 
             _alertInfo.value = AlertInfo(
                 logId = log.id,
@@ -58,13 +58,18 @@ class AlertViewModel(
             medicationRepository.updateLog(
                 log.copy(confirmedAt = System.currentTimeMillis(), status = MedicationLogStatus.CONFIRMED)
             )
+            // Line up the next occurrence now that this dose is resolved; this also
+            // supersedes the still-pending missed-dose check for this dose.
+            medicationRepository.getScheduleById(scheduleId)?.let { schedule ->
+                alarmScheduler.schedule(scheduleId, info.medicationId, schedule.time, schedule.daysOfWeek)
+            }
             _actionResult.value = AlertActionResult.Confirmed
         }
     }
 
     fun postpone() {
         val info = _alertInfo.value ?: return
-        alarmScheduler.postpone(scheduleId, info.medicationId)
+        alarmScheduler.postpone(scheduleId, info.medicationId, info.logId)
         _actionResult.value = AlertActionResult.Postponed
     }
 

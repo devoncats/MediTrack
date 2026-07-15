@@ -26,6 +26,11 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
         DashboardViewModelFactory(requireContext())
     }
 
+    override fun onResume() {
+        super.onResume()
+        medListViewModel.refreshTodayRange()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
