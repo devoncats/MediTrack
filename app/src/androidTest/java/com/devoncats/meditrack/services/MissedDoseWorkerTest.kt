@@ -6,6 +6,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.ListenableWorker
+import androidx.work.WorkerFactory
+import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.devoncats.meditrack.data.local.MediTrackDatabase
@@ -13,8 +15,11 @@ import com.devoncats.meditrack.data.local.entity.MedicationEntity
 import com.devoncats.meditrack.data.local.entity.MedicationLogEntity
 import com.devoncats.meditrack.data.local.entity.ScheduleEntity
 import com.devoncats.meditrack.data.local.entity.UserEntity
+import com.devoncats.meditrack.data.repository.MedicationRepositoryImpl
+import com.devoncats.meditrack.data.repository.UserRepositoryImpl
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.domain.usecase.EvaluateMissedDoseUseCase
 import com.devoncats.meditrack.utils.PasswordHasher
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -32,6 +37,34 @@ class MissedDoseWorkerTest {
     fun setUp() {
         InstrumentationRegistry.getInstrumentation().uiAutomation
             .grantRuntimePermission(context.packageName, "android.permission.POST_NOTIFICATIONS")
+    }
+
+    // TestListenableWorkerBuilder.build() reflects for a plain (Context, WorkerParameters)
+    // constructor when no factory is supplied, which no longer exists now that MissedDoseWorker
+    // takes its EvaluateMissedDoseUseCase via @AssistedInject. This factory constructs the
+    // worker the same way the Hilt-generated one would, wiring real repositories from the DAOs
+    // (matching this test class's existing style of hitting the real Room database, not mocks).
+    private fun missedDoseWorkerFactory(): WorkerFactory = object : WorkerFactory() {
+        override fun createWorker(
+            appContext: Context,
+            workerClassName: String,
+            workerParameters: WorkerParameters
+        ): ListenableWorker {
+            val database = MediTrackDatabase.getInstance(appContext)
+            val medicationRepository = MedicationRepositoryImpl(
+                database.medicationDao(),
+                database.scheduleDao(),
+                database.medicationLogDao()
+            )
+            val userRepository = UserRepositoryImpl(database.userDao())
+            val evaluateMissedDoseUseCase = EvaluateMissedDoseUseCase(
+                medicationRepository,
+                userRepository,
+                AlarmScheduler(appContext),
+                NotificationHelper(appContext)
+            )
+            return MissedDoseWorker(appContext, workerParameters, evaluateMissedDoseUseCase)
+        }
     }
 
     private suspend fun seedUserAndMedication(email: String, role: UserRole, name: String): Pair<Long, Long> {
@@ -90,6 +123,7 @@ class MissedDoseWorkerTest {
                     MissedDoseWorker.KEY_SCHEDULE_ID to scheduleId
                 )
             )
+            .setWorkerFactory(missedDoseWorkerFactory())
             .build()
 
         val result = worker.startWork().get()
@@ -126,6 +160,7 @@ class MissedDoseWorkerTest {
                     MissedDoseWorker.KEY_SCHEDULE_ID to scheduleId
                 )
             )
+            .setWorkerFactory(missedDoseWorkerFactory())
             .build()
 
         worker.startWork().get()
@@ -155,6 +190,7 @@ class MissedDoseWorkerTest {
                     MissedDoseWorker.KEY_SCHEDULE_ID to scheduleId
                 )
             )
+            .setWorkerFactory(missedDoseWorkerFactory())
             .build()
 
         val result = worker.startWork().get()
@@ -204,6 +240,7 @@ class MissedDoseWorkerTest {
                     MissedDoseWorker.KEY_SCHEDULE_ID to morningScheduleId
                 )
             )
+            .setWorkerFactory(missedDoseWorkerFactory())
             .build()
 
         worker.startWork().get()
