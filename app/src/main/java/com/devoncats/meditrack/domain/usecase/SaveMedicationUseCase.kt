@@ -9,13 +9,14 @@ import com.devoncats.meditrack.services.AlarmScheduler
 import com.devoncats.meditrack.services.FileStorageHelper
 import java.time.DayOfWeek
 import java.time.LocalTime
+import javax.inject.Inject
 
 sealed class SaveMedicationResult {
     data class Success(val medicationId: Long) : SaveMedicationResult()
     data object ValidationError : SaveMedicationResult()
 }
 
-class SaveMedicationUseCase(
+class SaveMedicationUseCase @Inject constructor(
     private val medicationRepository: MedicationRepository,
     private val alarmScheduler: AlarmScheduler,
     private val fileStorageHelper: FileStorageHelper

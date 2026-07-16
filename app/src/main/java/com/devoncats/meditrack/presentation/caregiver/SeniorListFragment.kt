@@ -12,12 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.devoncats.meditrack.R
 import com.devoncats.meditrack.presentation.NavArgKeys
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SeniorListFragment : Fragment(R.layout.fragment_senior_list) {
 
-    private val viewModel: SeniorListViewModel by viewModels {
-        SeniorListViewModelFactory(requireContext())
-    }
+    private val viewModel: SeniorListViewModel by viewModels()
 
     override fun onResume() {
         super.onResume()

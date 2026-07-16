@@ -3,13 +3,18 @@ package com.devoncats.meditrack.presentation.patient
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.domain.usecase.SaveMedicationResult
 import com.devoncats.meditrack.domain.usecase.SaveMedicationUseCase
+import com.devoncats.meditrack.presentation.NavArgKeys
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.DayOfWeek
 import java.time.LocalTime
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 sealed class MedFormSaveResult {
@@ -27,12 +32,16 @@ data class MedFormPrefill(
     val photoUri: String?
 )
 
-class MedFormViewModel(
+@HiltViewModel
+class MedFormViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
     private val saveMedicationUseCase: SaveMedicationUseCase,
-    private val ownerUserId: Long,
-    private val medicationId: Long
+    sessionManager: SessionManager,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val medicationId: Long = savedStateHandle.get<Long>(NavArgKeys.MEDICATION_ID) ?: NEW_MEDICATION_ID
+    private val ownerUserId: Long = savedStateHandle.get<Long>(NavArgKeys.SENIOR_USER_ID) ?: sessionManager.getUserId()
 
     val isEditMode: Boolean = medicationId != NEW_MEDICATION_ID
 

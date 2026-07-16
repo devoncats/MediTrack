@@ -10,12 +10,14 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.devoncats.meditrack.domain.model.WeekDays
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class AlarmScheduler(private val context: Context) {
+class AlarmScheduler @Inject constructor(@ApplicationContext private val context: Context) {
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     private val workManager by lazy { WorkManager.getInstance(context) }

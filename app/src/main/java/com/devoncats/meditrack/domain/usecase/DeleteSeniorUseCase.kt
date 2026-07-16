@@ -3,8 +3,9 @@ package com.devoncats.meditrack.domain.usecase
 import com.devoncats.meditrack.domain.model.User
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.domain.repository.UserRepository
+import javax.inject.Inject
 
-class DeleteSeniorUseCase(
+class DeleteSeniorUseCase @Inject constructor(
     private val userRepository: UserRepository,
     private val medicationRepository: MedicationRepository,
     private val deleteMedicationUseCase: DeleteMedicationUseCase

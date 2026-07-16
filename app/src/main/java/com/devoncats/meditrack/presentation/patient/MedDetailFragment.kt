@@ -19,19 +19,15 @@ import com.devoncats.meditrack.services.FileStorageHelper
 import com.devoncats.meditrack.utils.DateUtils
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
 
-    private val medicationId: Long
-        get() = arguments?.getLong(NavArgKeys.MEDICATION_ID, -1L) ?: -1L
-
     private val seniorUserId: Long
-        get() = arguments?.getLong(NavArgKeys.SENIOR_USER_ID, MedFormViewModelFactory.NO_SENIOR_USER_ID)
-            ?: MedFormViewModelFactory.NO_SENIOR_USER_ID
+        get() = arguments?.getLong(NavArgKeys.SENIOR_USER_ID, NO_SENIOR_USER_ID) ?: NO_SENIOR_USER_ID
 
-    private val viewModel: MedDetailViewModel by viewModels {
-        MedDetailViewModelFactory(requireContext(), medicationId)
-    }
+    private val viewModel: MedDetailViewModel by viewModels()
 
     private val fileStorageHelper by lazy { FileStorageHelper(requireContext()) }
 
@@ -73,7 +69,7 @@ class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
 
             editButton.setOnClickListener {
                 val args = bundleOf(NavArgKeys.MEDICATION_ID to medication.id)
-                if (seniorUserId != MedFormViewModelFactory.NO_SENIOR_USER_ID) {
+                if (seniorUserId != NO_SENIOR_USER_ID) {
                     args.putLong(NavArgKeys.SENIOR_USER_ID, seniorUserId)
                 }
                 findNavController().navigate(R.id.action_medDetail_to_medForm, args)
@@ -115,5 +111,9 @@ class MedDetailFragment : Fragment(R.layout.fragment_med_detail) {
             )
             container.addView(row)
         }
+    }
+
+    companion object {
+        private const val NO_SENIOR_USER_ID = -1L
     }
 }

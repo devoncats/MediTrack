@@ -3,11 +3,14 @@ package com.devoncats.meditrack.presentation.senior
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.utils.DateUtils
 import com.devoncats.meditrack.utils.toHHmm
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -19,10 +22,13 @@ data class SeniorMedicationItem(
     val scheduleSummary: String
 )
 
-class SeniorMedListViewModel(
+@HiltViewModel
+class SeniorMedListViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
-    seniorUserId: Long
+    sessionManager: SessionManager
 ) : ViewModel() {
+
+    private val seniorUserId: Long = sessionManager.getUserId()
 
     private val todayRange = MutableStateFlow(DateUtils.todayRangeMillis())
 

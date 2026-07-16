@@ -4,15 +4,20 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
-import com.devoncats.meditrack.data.local.MediTrackDatabase
-import com.devoncats.meditrack.data.repository.MedicationRepositoryImpl
 import com.devoncats.meditrack.domain.usecase.ConfirmDoseUseCase
 import com.devoncats.meditrack.domain.usecase.PostponeDoseUseCase
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MedicationActionReceiver : BroadcastReceiver() {
+
+    @Inject lateinit var confirmDoseUseCase: ConfirmDoseUseCase
+    @Inject lateinit var postponeDoseUseCase: PostponeDoseUseCase
+
     override fun onReceive(context: Context, intent: Intent) {
         val logId = intent.getLongExtra(EXTRA_LOG_ID, -1L)
         if (logId == -1L) return
@@ -28,13 +33,6 @@ class MedicationActionReceiver : BroadcastReceiver() {
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val database = MediTrackDatabase.getInstance(context)
-                val medicationRepository = MedicationRepositoryImpl(
-                    database.medicationDao(),
-                    database.scheduleDao(),
-                    database.medicationLogDao()
-                )
-                val confirmDoseUseCase = ConfirmDoseUseCase(medicationRepository, AlarmScheduler(context))
                 confirmDoseUseCase(logId, scheduleId)
                 NotificationManagerCompat.from(context).cancel(logId.toInt())
             } finally {
@@ -48,7 +46,6 @@ class MedicationActionReceiver : BroadcastReceiver() {
         val medicationId = intent.getLongExtra(EXTRA_MEDICATION_ID, -1L)
         if (scheduleId == -1L || medicationId == -1L) return
 
-        val postponeDoseUseCase = PostponeDoseUseCase(AlarmScheduler(context))
         postponeDoseUseCase(scheduleId, medicationId, logId)
         NotificationManagerCompat.from(context).cancel(logId.toInt())
     }

@@ -53,7 +53,7 @@ abstract class MediTrackDatabase : RoomDatabase() {
         }
 
         // v2 -> v3: "email" never held a real email for SENIOR_PATIENT rows (it holds a
-        // synthetic username, see CreateSeniorPatientViewModel.buildUsername), so the column
+        // synthetic username, see CreateSeniorPatientUseCase.buildUsername), so the column
         // is renamed to match what it actually stores. The RENAME COLUMN alone would leave the
         // unique index pointing at a column reference Room can resolve, but Room's schema
         // validation checks the index *name* too (derived as index_users_<column>), so the old

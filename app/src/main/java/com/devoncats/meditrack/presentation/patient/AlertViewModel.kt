@@ -2,12 +2,16 @@ package com.devoncats.meditrack.presentation.patient
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.domain.usecase.ConfirmDoseUseCase
 import com.devoncats.meditrack.domain.usecase.PostponeDoseUseCase
+import com.devoncats.meditrack.presentation.NavArgKeys
 import com.devoncats.meditrack.utils.toHHmm
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 data class AlertInfo(
@@ -18,12 +22,15 @@ data class AlertInfo(
     val scheduledTime: String
 )
 
-class AlertViewModel(
+@HiltViewModel
+class AlertViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
     private val confirmDoseUseCase: ConfirmDoseUseCase,
     private val postponeDoseUseCase: PostponeDoseUseCase,
-    private val scheduleId: Long
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val scheduleId: Long = savedStateHandle.get<Long>(NavArgKeys.SCHEDULE_ID) ?: -1L
 
     private val _alertInfo = MutableLiveData<AlertInfo?>()
     val alertInfo: LiveData<AlertInfo?> = _alertInfo

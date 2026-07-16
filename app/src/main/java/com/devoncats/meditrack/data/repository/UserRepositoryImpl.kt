@@ -4,10 +4,11 @@ import com.devoncats.meditrack.data.local.dao.UserDao
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.User
 import com.devoncats.meditrack.domain.repository.UserRepository
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class UserRepositoryImpl(private val userDao: UserDao) : UserRepository {
+class UserRepositoryImpl @Inject constructor(private val userDao: UserDao) : UserRepository {
 
     override suspend fun insert(user: User): Long =
         userDao.insert(user.toEntity())

@@ -12,20 +12,17 @@ import com.devoncats.meditrack.R
 import com.devoncats.meditrack.presentation.NavArgKeys
 import com.devoncats.meditrack.presentation.logout
 import com.devoncats.meditrack.presentation.patient.MedListViewModel
-import com.devoncats.meditrack.presentation.patient.MedListViewModelFactory
 import com.devoncats.meditrack.presentation.patient.MedicationListAdapter
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
-    private val medListViewModel: MedListViewModel by viewModels {
-        MedListViewModelFactory(requireContext())
-    }
+    private val medListViewModel: MedListViewModel by viewModels()
 
-    private val dashboardViewModel: DashboardViewModel by viewModels {
-        DashboardViewModelFactory(requireContext())
-    }
+    private val dashboardViewModel: DashboardViewModel by viewModels()
 
     override fun onResume() {
         super.onResume()

@@ -13,8 +13,10 @@ import androidx.core.os.bundleOf
 import androidx.navigation.NavDeepLinkBuilder
 import com.devoncats.meditrack.R
 import com.devoncats.meditrack.presentation.NavArgKeys
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class NotificationHelper(private val context: Context) {
+class NotificationHelper @Inject constructor(@ApplicationContext private val context: Context) {
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun showMedicationAlarmNotification(

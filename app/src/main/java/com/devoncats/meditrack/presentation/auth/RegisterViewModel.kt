@@ -7,9 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.devoncats.meditrack.domain.model.UserRole
 import com.devoncats.meditrack.domain.usecase.RegisterResult
 import com.devoncats.meditrack.domain.usecase.RegisterUserUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 
-class RegisterViewModel(private val registerUserUseCase: RegisterUserUseCase) : ViewModel() {
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
+    private val registerUserUseCase: RegisterUserUseCase
+) : ViewModel() {
 
     private val _registerResult = MutableLiveData<RegisterResult>()
     val registerResult: LiveData<RegisterResult> = _registerResult

@@ -16,10 +16,11 @@ import com.devoncats.meditrack.utils.toCsv
 import com.devoncats.meditrack.utils.toHHmm
 import com.devoncats.meditrack.utils.toLocalTime
 import com.devoncats.meditrack.utils.toWeekDays
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class MedicationRepositoryImpl(
+class MedicationRepositoryImpl @Inject constructor(
     private val medicationDao: MedicationDao,
     private val scheduleDao: ScheduleDao,
     private val medicationLogDao: MedicationLogDao

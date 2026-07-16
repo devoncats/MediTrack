@@ -2,8 +2,9 @@ package com.devoncats.meditrack.domain.usecase
 
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.services.AlarmScheduler
+import javax.inject.Inject
 
-class RescheduleAllAlarmsUseCase(
+class RescheduleAllAlarmsUseCase @Inject constructor(
     private val medicationRepository: MedicationRepository,
     private val alarmScheduler: AlarmScheduler
 ) {

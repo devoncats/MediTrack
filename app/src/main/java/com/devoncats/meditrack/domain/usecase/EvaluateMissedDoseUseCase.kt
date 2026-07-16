@@ -6,8 +6,9 @@ import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.domain.repository.UserRepository
 import com.devoncats.meditrack.services.AlarmScheduler
 import com.devoncats.meditrack.services.NotificationHelper
+import javax.inject.Inject
 
-class EvaluateMissedDoseUseCase(
+class EvaluateMissedDoseUseCase @Inject constructor(
     private val medicationRepository: MedicationRepository,
     private val userRepository: UserRepository,
     private val alarmScheduler: AlarmScheduler,

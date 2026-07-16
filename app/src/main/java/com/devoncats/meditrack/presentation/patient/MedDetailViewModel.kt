@@ -2,6 +2,7 @@ package com.devoncats.meditrack.presentation.patient
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -9,18 +10,24 @@ import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.MedicationLog
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.domain.usecase.DeleteMedicationUseCase
+import com.devoncats.meditrack.presentation.NavArgKeys
 import com.devoncats.meditrack.utils.DateUtils
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class MedDetailViewModel(
+@HiltViewModel
+class MedDetailViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
     private val deleteMedicationUseCase: DeleteMedicationUseCase,
-    private val medicationId: Long
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val medicationId: Long = savedStateHandle.get<Long>(NavArgKeys.MEDICATION_ID) ?: -1L
 
     val medication: LiveData<Medication?> = medicationRepository.observeMedicationById(medicationId).asLiveData()
 

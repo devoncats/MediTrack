@@ -1,13 +1,18 @@
 package com.devoncats.meditrack.presentation.patient
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.domain.model.Medication
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.repository.MedicationRepository
+import com.devoncats.meditrack.presentation.NavArgKeys
 import com.devoncats.meditrack.utils.DateUtils
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -19,10 +24,16 @@ data class MedicationListItem(
     val todayStatus: MedicationLogStatus?
 )
 
-class MedListViewModel(
+@HiltViewModel
+class MedListViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
-    ownerUserId: Long
+    sessionManager: SessionManager,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    // Doubles as the patient's own list (no SENIOR_USER_ID arg, falls back to the logged-in
+    // user) and a caregiver's view of a senior's list (SeniorDetailFragment passes it).
+    private val ownerUserId: Long = savedStateHandle.get<Long>(NavArgKeys.SENIOR_USER_ID) ?: sessionManager.getUserId()
 
     fun findScheduleIdForAlert(medicationId: Long, onResult: (Long?) -> Unit) {
         viewModelScope.launch {

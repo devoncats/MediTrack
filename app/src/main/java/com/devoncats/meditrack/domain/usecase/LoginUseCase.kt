@@ -4,13 +4,14 @@ import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.domain.model.UserRole
 import com.devoncats.meditrack.domain.repository.UserRepository
 import com.devoncats.meditrack.utils.PasswordHasher
+import javax.inject.Inject
 
 sealed class LoginResult {
     data class Success(val role: UserRole) : LoginResult()
     data object InvalidCredentials : LoginResult()
 }
 
-class LoginUseCase(
+class LoginUseCase @Inject constructor(
     private val userRepository: UserRepository,
     private val sessionManager: SessionManager
 ) {

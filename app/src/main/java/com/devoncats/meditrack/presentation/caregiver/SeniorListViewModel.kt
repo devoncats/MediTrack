@@ -4,12 +4,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.User
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.domain.repository.UserRepository
 import com.devoncats.meditrack.domain.usecase.DeleteSeniorUseCase
 import com.devoncats.meditrack.utils.DateUtils
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -21,12 +24,15 @@ data class SeniorListItem(
     val todayStatus: MedicationLogStatus?
 )
 
-class SeniorListViewModel(
+@HiltViewModel
+class SeniorListViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val medicationRepository: MedicationRepository,
     private val deleteSeniorUseCase: DeleteSeniorUseCase,
-    caregiverId: Long
+    sessionManager: SessionManager
 ) : ViewModel() {
+
+    private val caregiverId: Long = sessionManager.getUserId()
 
     private val todayRange = MutableStateFlow(DateUtils.todayRangeMillis())
 

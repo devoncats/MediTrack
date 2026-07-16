@@ -7,6 +7,7 @@ import com.devoncats.meditrack.domain.repository.EmergencyContactRepository
 import com.devoncats.meditrack.domain.repository.UserRepository
 import com.devoncats.meditrack.utils.PasswordHasher
 import java.security.SecureRandom
+import javax.inject.Inject
 
 data class GeneratedCredentials(val username: String, val pin: String)
 
@@ -15,7 +16,7 @@ sealed class CreateSeniorPatientResult {
     data object ValidationError : CreateSeniorPatientResult()
 }
 
-class CreateSeniorPatientUseCase(
+class CreateSeniorPatientUseCase @Inject constructor(
     private val userRepository: UserRepository,
     private val emergencyContactRepository: EmergencyContactRepository
 ) {
