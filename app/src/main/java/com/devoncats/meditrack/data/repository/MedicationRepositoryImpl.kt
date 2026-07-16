@@ -1,7 +1,5 @@
 package com.devoncats.meditrack.data.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.devoncats.meditrack.data.local.dao.MedicationDao
 import com.devoncats.meditrack.data.local.dao.MedicationLogDao
 import com.devoncats.meditrack.data.local.dao.ScheduleDao
@@ -14,8 +12,15 @@ import com.devoncats.meditrack.domain.model.MissedDoseAlert
 import com.devoncats.meditrack.domain.model.Schedule
 import com.devoncats.meditrack.domain.model.SeniorDoseStatus
 import com.devoncats.meditrack.domain.repository.MedicationRepository
+import com.devoncats.meditrack.utils.toCsv
+import com.devoncats.meditrack.utils.toHHmm
+import com.devoncats.meditrack.utils.toLocalTime
+import com.devoncats.meditrack.utils.toWeekDays
+import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-class MedicationRepositoryImpl(
+class MedicationRepositoryImpl @Inject constructor(
     private val medicationDao: MedicationDao,
     private val scheduleDao: ScheduleDao,
     private val medicationLogDao: MedicationLogDao
@@ -36,10 +41,10 @@ class MedicationRepositoryImpl(
     override suspend fun getMedicationsByOwner(ownerUserId: Long): List<Medication> =
         medicationDao.getByOwner(ownerUserId).map { it.toDomain() }
 
-    override fun observeMedicationsByOwner(ownerUserId: Long): LiveData<List<Medication>> =
+    override fun observeMedicationsByOwner(ownerUserId: Long): Flow<List<Medication>> =
         medicationDao.observeByOwner(ownerUserId).map { list -> list.map { it.toDomain() } }
 
-    override fun observeMedicationById(id: Long): LiveData<Medication?> =
+    override fun observeMedicationById(id: Long): Flow<Medication?> =
         medicationDao.observeById(id).map { it?.toDomain() }
 
     override suspend fun insertSchedule(schedule: Schedule): Long =
@@ -57,7 +62,10 @@ class MedicationRepositoryImpl(
     override suspend fun getScheduleById(id: Long): Schedule? =
         scheduleDao.findById(id)?.toDomain()
 
-    override fun observeSchedulesByMedication(medicationId: Long): LiveData<List<Schedule>> =
+    override suspend fun getAllSchedules(): List<Schedule> =
+        scheduleDao.getAll().map { it.toDomain() }
+
+    override fun observeSchedulesByMedication(medicationId: Long): Flow<List<Schedule>> =
         scheduleDao.observeByMedication(medicationId).map { list -> list.map { it.toDomain() } }
 
     override suspend fun insertLog(log: MedicationLog): Long =
@@ -75,14 +83,14 @@ class MedicationRepositoryImpl(
     override suspend fun getLatestPendingLogForSchedule(scheduleId: Long): MedicationLog? =
         medicationLogDao.findLatestPendingBySchedule(scheduleId)?.toDomain()
 
-    override fun observeLogsByMedication(medicationId: Long): LiveData<List<MedicationLog>> =
+    override fun observeLogsByMedication(medicationId: Long): Flow<List<MedicationLog>> =
         medicationLogDao.observeByMedication(medicationId).map { list -> list.map { it.toDomain() } }
 
     override fun observeLogsByMedicationBetween(
         medicationId: Long,
         startInclusive: Long,
         endExclusive: Long
-    ): LiveData<List<MedicationLog>> =
+    ): Flow<List<MedicationLog>> =
         medicationLogDao.observeByMedicationBetween(medicationId, startInclusive, endExclusive)
             .map { list -> list.map { it.toDomain() } }
 
@@ -90,11 +98,11 @@ class MedicationRepositoryImpl(
         ownerUserId: Long,
         startInclusive: Long,
         endExclusive: Long
-    ): LiveData<List<MedicationLog>> =
+    ): Flow<List<MedicationLog>> =
         medicationLogDao.observeByOwnerBetween(ownerUserId, startInclusive, endExclusive)
             .map { list -> list.map { it.toDomain() } }
 
-    override fun observeMissedDoseAlertsForCaregiver(caregiverId: Long): LiveData<List<MissedDoseAlert>> =
+    override fun observeMissedDoseAlertsForCaregiver(caregiverId: Long): Flow<List<MissedDoseAlert>> =
         medicationLogDao.observeMissedDoseAlertsForCaregiver(caregiverId).map { rows ->
             rows.map {
                 MissedDoseAlert(
@@ -110,7 +118,7 @@ class MedicationRepositoryImpl(
         caregiverId: Long,
         startInclusive: Long,
         endExclusive: Long
-    ): LiveData<List<SeniorDoseStatus>> =
+    ): Flow<List<SeniorDoseStatus>> =
         medicationLogDao.observeTodayLogStatusesForCaregiverSeniors(caregiverId, startInclusive, endExclusive)
             .map { rows -> rows.map { SeniorDoseStatus(it.seniorId, it.status) } }
 
@@ -139,15 +147,15 @@ class MedicationRepositoryImpl(
     private fun ScheduleEntity.toDomain() = Schedule(
         id = id,
         medicationId = medicationId,
-        time = time,
-        daysOfWeek = daysOfWeek
+        time = time.toLocalTime(),
+        daysOfWeek = daysOfWeek.toWeekDays()
     )
 
     private fun Schedule.toEntity() = ScheduleEntity(
         id = id,
         medicationId = medicationId,
-        time = time,
-        daysOfWeek = daysOfWeek
+        time = time.toHHmm(),
+        daysOfWeek = daysOfWeek.toCsv()
     )
 
     private fun MedicationLogEntity.toDomain() = MedicationLog(

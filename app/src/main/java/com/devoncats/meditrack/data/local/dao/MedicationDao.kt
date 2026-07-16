@@ -1,12 +1,12 @@
 package com.devoncats.meditrack.data.local.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.devoncats.meditrack.data.local.entity.MedicationEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MedicationDao {
@@ -23,11 +23,11 @@ interface MedicationDao {
     suspend fun findById(id: Long): MedicationEntity?
 
     @Query("SELECT * FROM medications WHERE ownerUserId = :ownerUserId ORDER BY name ASC")
-    fun observeByOwner(ownerUserId: Long): LiveData<List<MedicationEntity>>
+    fun observeByOwner(ownerUserId: Long): Flow<List<MedicationEntity>>
 
     @Query("SELECT * FROM medications WHERE ownerUserId = :ownerUserId ORDER BY name ASC")
     suspend fun getByOwner(ownerUserId: Long): List<MedicationEntity>
 
     @Query("SELECT * FROM medications WHERE id = :id LIMIT 1")
-    fun observeById(id: Long): LiveData<MedicationEntity?>
+    fun observeById(id: Long): Flow<MedicationEntity?>
 }

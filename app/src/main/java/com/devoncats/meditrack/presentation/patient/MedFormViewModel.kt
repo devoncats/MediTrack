@@ -3,17 +3,18 @@ package com.devoncats.meditrack.presentation.patient
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.devoncats.meditrack.domain.model.Medication
-import com.devoncats.meditrack.domain.model.Schedule
+import com.devoncats.meditrack.data.local.SessionManager
 import com.devoncats.meditrack.domain.repository.MedicationRepository
-import com.devoncats.meditrack.services.AlarmScheduler
-import com.devoncats.meditrack.services.FileStorageHelper
-import com.devoncats.meditrack.utils.toCode
-import com.devoncats.meditrack.utils.toDayOfWeekOrNull
+import com.devoncats.meditrack.domain.usecase.SaveMedicationResult
+import com.devoncats.meditrack.domain.usecase.SaveMedicationUseCase
+import com.devoncats.meditrack.presentation.NavArgKeys
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.DayOfWeek
 import java.time.LocalTime
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 sealed class MedFormSaveResult {
@@ -31,13 +32,16 @@ data class MedFormPrefill(
     val photoUri: String?
 )
 
-class MedFormViewModel(
+@HiltViewModel
+class MedFormViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
-    private val alarmScheduler: AlarmScheduler,
-    private val fileStorageHelper: FileStorageHelper,
-    private val ownerUserId: Long,
-    private val medicationId: Long
+    private val saveMedicationUseCase: SaveMedicationUseCase,
+    sessionManager: SessionManager,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val medicationId: Long = savedStateHandle.get<Long>(NavArgKeys.MEDICATION_ID) ?: NEW_MEDICATION_ID
+    private val ownerUserId: Long = savedStateHandle.get<Long>(NavArgKeys.SENIOR_USER_ID) ?: sessionManager.getUserId()
 
     val isEditMode: Boolean = medicationId != NEW_MEDICATION_ID
 
@@ -52,12 +56,8 @@ class MedFormViewModel(
             viewModelScope.launch {
                 val medication = medicationRepository.getMedicationById(medicationId) ?: return@launch
                 val schedules = medicationRepository.getSchedulesByMedication(medicationId)
-                val days = schedules.firstOrNull()?.daysOfWeek
-                    ?.split(",")
-                    ?.mapNotNull { it.toDayOfWeekOrNull() }
-                    ?.toSet()
-                    .orEmpty()
-                val times = schedules.mapNotNull { runCatching { LocalTime.parse(it.time) }.getOrNull() }
+                val days = schedules.firstOrNull()?.daysOfWeek?.days.orEmpty()
+                val times = schedules.map { it.time }
 
                 _prefill.value = MedFormPrefill(
                     name = medication.name,
@@ -81,66 +81,22 @@ class MedFormViewModel(
         selectedTimes: List<LocalTime>,
         capturedPhotoUri: Uri?
     ) {
-        if (name.isBlank() || dose.isBlank() || frequency.isBlank() || selectedDays.isEmpty() || selectedTimes.isEmpty()) {
-            _saveResult.value = MedFormSaveResult.ValidationError
-            return
-        }
-
         viewModelScope.launch {
-            val existingMedication = if (isEditMode) medicationRepository.getMedicationById(medicationId) else null
-            val photoUriToPersist = if (capturedPhotoUri != null) {
-                existingMedication?.photoUri?.takeIf { it.isNotBlank() }?.let { fileStorageHelper.deletePhoto(it) }
-                fileStorageHelper.savePhoto(capturedPhotoUri)
-            } else {
-                existingMedication?.photoUri
+            val result = saveMedicationUseCase(
+                ownerUserId = ownerUserId,
+                existingMedicationId = if (isEditMode) medicationId else null,
+                name = name,
+                dose = dose,
+                frequency = frequency,
+                instructions = instructions,
+                selectedDays = selectedDays,
+                selectedTimes = selectedTimes,
+                capturedPhotoUri = capturedPhotoUri
+            )
+            _saveResult.value = when (result) {
+                is SaveMedicationResult.Success -> MedFormSaveResult.Success
+                SaveMedicationResult.ValidationError -> MedFormSaveResult.ValidationError
             }
-
-            val resolvedMedicationId = if (isEditMode) {
-                medicationRepository.updateMedication(
-                    Medication(
-                        id = medicationId,
-                        name = name,
-                        dose = dose,
-                        frequency = frequency,
-                        instructions = instructions?.takeIf { it.isNotBlank() },
-                        ownerUserId = ownerUserId,
-                        photoUri = photoUriToPersist,
-                        createdAt = existingMedication?.createdAt ?: System.currentTimeMillis()
-                    )
-                )
-                medicationId
-            } else {
-                medicationRepository.insertMedication(
-                    Medication(
-                        id = 0,
-                        name = name,
-                        dose = dose,
-                        frequency = frequency,
-                        instructions = instructions?.takeIf { it.isNotBlank() },
-                        ownerUserId = ownerUserId,
-                        photoUri = photoUriToPersist,
-                        createdAt = System.currentTimeMillis()
-                    )
-                )
-            }
-
-            if (isEditMode) {
-                medicationRepository.getSchedulesByMedication(resolvedMedicationId).forEach { oldSchedule ->
-                    alarmScheduler.cancel(oldSchedule.id)
-                    medicationRepository.deleteSchedule(oldSchedule)
-                }
-            }
-
-            val daysOfWeek = selectedDays.joinToString(",") { it.toCode() }
-            selectedTimes.forEach { time ->
-                val timeString = "%02d:%02d".format(time.hour, time.minute)
-                val scheduleId = medicationRepository.insertSchedule(
-                    Schedule(id = 0, medicationId = resolvedMedicationId, time = timeString, daysOfWeek = daysOfWeek)
-                )
-                alarmScheduler.schedule(scheduleId, resolvedMedicationId, timeString, daysOfWeek)
-            }
-
-            _saveResult.value = MedFormSaveResult.Success
         }
     }
 

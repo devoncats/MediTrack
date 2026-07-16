@@ -10,9 +10,12 @@ import com.devoncats.meditrack.domain.model.MedicationLog
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.Schedule
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.domain.model.WeekDays
 import com.devoncats.meditrack.domain.repository.MedicationRepository
 import com.devoncats.meditrack.getOrAwaitValue
 import com.devoncats.meditrack.utils.PasswordHasher
+import java.time.DayOfWeek
+import java.time.LocalTime
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -41,7 +44,7 @@ class MedicationRepositoryTest {
         ownerUserId = database.userDao().insert(
             UserEntity(
                 name = "Owner",
-                email = "owner@meditrack.com",
+                username = "owner@meditrack.com",
                 passwordHash = PasswordHasher.hash("password123"),
                 role = UserRole.PATIENT,
                 caregiverId = null
@@ -92,7 +95,14 @@ class MedicationRepositoryTest {
             )
         )
 
-        repository.insertSchedule(Schedule(id = 0, medicationId = medicationId, time = "08:00", daysOfWeek = "MON,TUE"))
+        repository.insertSchedule(
+            Schedule(
+                id = 0,
+                medicationId = medicationId,
+                time = LocalTime.of(8, 0),
+                daysOfWeek = WeekDays(setOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY))
+            )
+        )
         val schedules = repository.observeSchedulesByMedication(medicationId).getOrAwaitValue()
         assertEquals(1, schedules!!.size)
 

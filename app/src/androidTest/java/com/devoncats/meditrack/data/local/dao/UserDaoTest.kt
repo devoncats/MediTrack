@@ -38,22 +38,22 @@ class UserDaoTest {
     }
 
     @Test
-    fun insertAndFindByEmail_returnsUserWithHashedPassword() = runBlocking {
+    fun insertAndFindByUsername_returnsUserWithHashedPassword() = runBlocking {
         val hashedPassword = PasswordHasher.hash("Sup3rSecret!")
         val user = UserEntity(
             name = "Jane Doe",
-            email = "jane@meditrack.com",
+            username = "jane@meditrack.com",
             passwordHash = hashedPassword,
             role = UserRole.PATIENT,
             caregiverId = null
         )
 
         val id = userDao.insert(user)
-        val found = userDao.findByEmail("jane@meditrack.com")
+        val found = userDao.findByUsername("jane@meditrack.com")
 
         assertNotNull(found)
         assertEquals(id, found?.id)
-        assertEquals("jane@meditrack.com", found?.email)
+        assertEquals("jane@meditrack.com", found?.username)
         assertEquals(hashedPassword, found?.passwordHash)
         assertTrue(PasswordHasher.verify("Sup3rSecret!", found!!.passwordHash))
     }
@@ -62,7 +62,7 @@ class UserDaoTest {
     fun deleteUser_removesItFromDatabase() = runBlocking {
         val user = UserEntity(
             name = "John Doe",
-            email = "john@meditrack.com",
+            username = "john@meditrack.com",
             passwordHash = PasswordHasher.hash("anotherPassword"),
             role = UserRole.CAREGIVER,
             caregiverId = null
@@ -72,6 +72,6 @@ class UserDaoTest {
 
         userDao.delete(inserted)
 
-        assertNull(userDao.findByEmail("john@meditrack.com"))
+        assertNull(userDao.findByUsername("john@meditrack.com"))
     }
 }

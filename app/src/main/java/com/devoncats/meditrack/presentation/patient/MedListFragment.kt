@@ -12,12 +12,12 @@ import com.devoncats.meditrack.R
 import com.devoncats.meditrack.presentation.NavArgKeys
 import com.devoncats.meditrack.presentation.logout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MedListFragment : Fragment(R.layout.fragment_med_list) {
 
-    private val viewModel: MedListViewModel by viewModels {
-        MedListViewModelFactory(requireContext())
-    }
+    private val viewModel: MedListViewModel by viewModels()
 
     override fun onResume() {
         super.onResume()

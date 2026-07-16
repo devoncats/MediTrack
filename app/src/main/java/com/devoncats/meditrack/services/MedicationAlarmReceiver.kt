@@ -3,15 +3,24 @@ package com.devoncats.meditrack.services
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.devoncats.meditrack.data.local.MediTrackDatabase
-import com.devoncats.meditrack.data.local.entity.MedicationLogEntity
+import com.devoncats.meditrack.domain.model.MedicationLog
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.domain.repository.MedicationRepository
+import com.devoncats.meditrack.domain.repository.UserRepository
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MedicationAlarmReceiver : BroadcastReceiver() {
+
+    @Inject lateinit var medicationRepository: MedicationRepository
+    @Inject lateinit var userRepository: UserRepository
+    @Inject lateinit var notificationHelper: NotificationHelper
+
     override fun onReceive(context: Context, intent: Intent) {
         val medicationId = intent.getLongExtra(AlarmScheduler.EXTRA_MEDICATION_ID, -1L)
         val scheduleId = intent.getLongExtra(AlarmScheduler.EXTRA_SCHEDULE_ID, -1L)
@@ -27,12 +36,10 @@ class MedicationAlarmReceiver : BroadcastReceiver() {
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val database = MediTrackDatabase.getInstance(context)
-                val medication = database.medicationDao().findById(medicationId)
+                val medication = medicationRepository.getMedicationById(medicationId)
                 if (medication != null) {
-                    val logDao = database.medicationLogDao()
                     val logId = if (postponedLogId != null) {
-                        val existingLog = logDao.findById(postponedLogId)
+                        val existingLog = medicationRepository.getLogById(postponedLogId)
                         // Dose was confirmed while the postponed alarm was in flight, or the
                         // log no longer exists: nothing to remind about anymore.
                         if (existingLog == null || existingLog.status != MedicationLogStatus.PENDING) {
@@ -40,8 +47,9 @@ class MedicationAlarmReceiver : BroadcastReceiver() {
                         }
                         postponedLogId
                     } else {
-                        logDao.insert(
-                            MedicationLogEntity(
+                        medicationRepository.insertLog(
+                            MedicationLog(
+                                id = 0,
                                 medicationId = medicationId,
                                 scheduleId = scheduleId,
                                 scheduledDatetime = nominalScheduledDatetime,
@@ -50,8 +58,8 @@ class MedicationAlarmReceiver : BroadcastReceiver() {
                             )
                         )
                     }
-                    val owner = database.userDao().findById(medication.ownerUserId)
-                    NotificationHelper(context).showMedicationAlarmNotification(
+                    val owner = userRepository.findById(medication.ownerUserId)
+                    notificationHelper.showMedicationAlarmNotification(
                         logId = logId,
                         scheduleId = scheduleId,
                         medicationId = medicationId,

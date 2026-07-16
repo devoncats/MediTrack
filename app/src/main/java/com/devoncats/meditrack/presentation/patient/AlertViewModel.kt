@@ -2,11 +2,16 @@ package com.devoncats.meditrack.presentation.patient
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.repository.MedicationRepository
-import com.devoncats.meditrack.services.AlarmScheduler
+import com.devoncats.meditrack.domain.usecase.ConfirmDoseUseCase
+import com.devoncats.meditrack.domain.usecase.PostponeDoseUseCase
+import com.devoncats.meditrack.presentation.NavArgKeys
+import com.devoncats.meditrack.utils.toHHmm
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 data class AlertInfo(
@@ -17,11 +22,15 @@ data class AlertInfo(
     val scheduledTime: String
 )
 
-class AlertViewModel(
+@HiltViewModel
+class AlertViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
-    private val alarmScheduler: AlarmScheduler,
-    private val scheduleId: Long
+    private val confirmDoseUseCase: ConfirmDoseUseCase,
+    private val postponeDoseUseCase: PostponeDoseUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val scheduleId: Long = savedStateHandle.get<Long>(NavArgKeys.SCHEDULE_ID) ?: -1L
 
     private val _alertInfo = MutableLiveData<AlertInfo?>()
     val alertInfo: LiveData<AlertInfo?> = _alertInfo
@@ -42,7 +51,7 @@ class AlertViewModel(
                 medicationId = medication.id,
                 medicationName = medication.name,
                 dose = medication.dose,
-                scheduledTime = schedule.time
+                scheduledTime = schedule.time.toHHmm()
             )
         }
     }
@@ -50,22 +59,14 @@ class AlertViewModel(
     fun confirm() {
         val info = _alertInfo.value ?: return
         viewModelScope.launch {
-            val log = medicationRepository.getLogById(info.logId) ?: return@launch
-            medicationRepository.updateLog(
-                log.copy(confirmedAt = System.currentTimeMillis(), status = MedicationLogStatus.CONFIRMED)
-            )
-            // Line up the next occurrence now that this dose is resolved; this also
-            // supersedes the still-pending missed-dose check for this dose.
-            medicationRepository.getScheduleById(scheduleId)?.let { schedule ->
-                alarmScheduler.schedule(scheduleId, info.medicationId, schedule.time, schedule.daysOfWeek)
-            }
+            confirmDoseUseCase(info.logId, scheduleId)
             _closeScreen.value = Unit
         }
     }
 
     fun postpone() {
         val info = _alertInfo.value ?: return
-        alarmScheduler.postpone(scheduleId, info.medicationId, info.logId)
+        postponeDoseUseCase(scheduleId, info.medicationId, info.logId)
         _closeScreen.value = Unit
     }
 

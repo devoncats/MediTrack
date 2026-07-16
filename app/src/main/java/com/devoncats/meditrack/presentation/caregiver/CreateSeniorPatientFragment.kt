@@ -8,14 +8,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
+import com.devoncats.meditrack.domain.usecase.CreateSeniorPatientResult
+import com.devoncats.meditrack.domain.usecase.GeneratedCredentials
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class CreateSeniorPatientFragment : Fragment(R.layout.fragment_create_senior_patient) {
 
-    private val viewModel: CreateSeniorPatientViewModel by viewModels {
-        CreateSeniorPatientViewModelFactory(requireContext())
-    }
+    private val viewModel: CreateSeniorPatientViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

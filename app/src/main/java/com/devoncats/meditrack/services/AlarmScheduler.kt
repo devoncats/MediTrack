@@ -9,19 +9,26 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.devoncats.meditrack.data.local.MediTrackDatabase
-import com.devoncats.meditrack.utils.toDayOfWeekOrNull
+import com.devoncats.meditrack.domain.model.WeekDays
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class AlarmScheduler(private val context: Context) {
+class AlarmScheduler @Inject constructor(@ApplicationContext private val context: Context) {
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     private val workManager by lazy { WorkManager.getInstance(context) }
 
-    fun schedule(scheduleId: Long, medicationId: Long, time: String, daysOfWeek: String, now: LocalDateTime = LocalDateTime.now()) {
+    fun schedule(
+        scheduleId: Long,
+        medicationId: Long,
+        time: LocalTime,
+        daysOfWeek: WeekDays,
+        now: LocalDateTime = LocalDateTime.now()
+    ) {
         val triggerAtMillis = nextTriggerMillis(time, daysOfWeek, now) ?: return
         // Carrying the nominal trigger time lets MedicationAlarmReceiver stamp the log with the
         // intended dose time instead of the actual (possibly Doze-delayed) firing time.
@@ -43,13 +50,6 @@ class AlarmScheduler(private val context: Context) {
         val pendingIntent = pendingIntentFor(scheduleId, medicationId, logId)
         setExactAlarm(triggerAtMillis, pendingIntent)
         enqueueMissedDoseCheck(scheduleId, medicationId, triggerAtMillis)
-    }
-
-    suspend fun rescheduleAll() {
-        val scheduleDao = MediTrackDatabase.getInstance(context).scheduleDao()
-        scheduleDao.getAll().forEach { schedule ->
-            schedule(schedule.id, schedule.medicationId, schedule.time, schedule.daysOfWeek)
-        }
     }
 
     fun cancel(scheduleId: Long) {
@@ -123,15 +123,14 @@ class AlarmScheduler(private val context: Context) {
         internal fun postponeTriggerMillis(now: LocalDateTime, minutes: Long): Long =
             now.plusMinutes(minutes).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-        internal fun nextTriggerMillis(time: String, daysOfWeek: String, now: LocalDateTime): Long? {
-            val localTime = runCatching { LocalTime.parse(time) }.getOrNull() ?: return null
-            val allowedDays = daysOfWeek.split(",").mapNotNull { it.toDayOfWeekOrNull() }.toSet()
+        internal fun nextTriggerMillis(time: LocalTime, daysOfWeek: WeekDays, now: LocalDateTime): Long? {
+            val allowedDays = daysOfWeek.days
             if (allowedDays.isEmpty()) return null
 
             for (dayOffset in 0..7) {
                 val candidateDate = now.toLocalDate().plusDays(dayOffset.toLong())
                 if (candidateDate.dayOfWeek !in allowedDays) continue
-                val candidateDateTime = candidateDate.atTime(localTime)
+                val candidateDateTime = candidateDate.atTime(time)
                 if (candidateDateTime.isAfter(now)) {
                     return candidateDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                 }

@@ -35,11 +35,11 @@ class LoginFragmentTest {
     fun seedTestUser(): Unit = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        userDao.findByEmail(testEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(testEmail)?.let { userDao.delete(it) }
         userDao.insert(
             UserEntity(
                 name = "Login Test User",
-                email = testEmail,
+                username = testEmail,
                 passwordHash = PasswordHasher.hash(testPassword),
                 role = UserRole.PATIENT,
                 caregiverId = null

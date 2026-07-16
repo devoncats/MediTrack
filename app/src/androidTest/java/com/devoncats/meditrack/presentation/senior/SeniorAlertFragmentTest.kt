@@ -24,9 +24,12 @@ import com.devoncats.meditrack.data.local.entity.ScheduleEntity
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.domain.model.WeekDays
 import com.devoncats.meditrack.getOrAwaitValue
 import com.devoncats.meditrack.services.AlarmScheduler
 import com.devoncats.meditrack.utils.PasswordHasher
+import java.time.DayOfWeek
+import java.time.LocalTime
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -51,11 +54,11 @@ class SeniorAlertFragmentTest {
         sessionManager.clearSession()
 
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        userDao.findByEmail(seniorEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(seniorEmail)?.let { userDao.delete(it) }
         seniorId = userDao.insert(
             UserEntity(
                 name = "Rosa Senior Alert Test",
-                email = seniorEmail,
+                username = seniorEmail,
                 passwordHash = PasswordHasher.hash("123456"),
                 role = UserRole.SENIOR_PATIENT,
                 caregiverId = null
@@ -86,7 +89,7 @@ class SeniorAlertFragmentTest {
                 status = MedicationLogStatus.PENDING
             )
         )
-        AlarmScheduler(context).schedule(scheduleId, medicationId, "08:00", "MON,TUE,WED,THU,FRI,SAT,SUN")
+        AlarmScheduler(context).schedule(scheduleId, medicationId, LocalTime.of(8, 0), WeekDays(DayOfWeek.entries.toSet()))
     }
 
     @After
@@ -122,7 +125,7 @@ class SeniorAlertFragmentTest {
     }
 
     @Test
-    fun confirmingDose_updatesLogToConfirmedAndSupersedesTheMissedDoseWorkerWithTheNextOccurrence() {
+    fun confirmingDose_updatesLogToConfirmedAndSupersedesTheMissedDoseWorkerWithTheNextOccurrence(): Unit = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val workName = AlarmScheduler.missedDoseWorkName(scheduleId)
         val workManager = WorkManager.getInstance(context)

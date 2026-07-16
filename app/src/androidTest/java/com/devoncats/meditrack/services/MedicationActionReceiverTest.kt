@@ -36,11 +36,11 @@ class MedicationActionReceiverTest {
             .grantRuntimePermission(context.packageName, "android.permission.POST_NOTIFICATIONS")
 
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        userDao.findByEmail(testEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(testEmail)?.let { userDao.delete(it) }
         val userId = userDao.insert(
             UserEntity(
                 name = "Action Receiver Test User",
-                email = testEmail,
+                username = testEmail,
                 passwordHash = PasswordHasher.hash("whatever123"),
                 role = UserRole.PATIENT,
                 caregiverId = null

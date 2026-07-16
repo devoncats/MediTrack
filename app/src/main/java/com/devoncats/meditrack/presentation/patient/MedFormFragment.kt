@@ -12,7 +12,6 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
-import com.devoncats.meditrack.presentation.NavArgKeys
 import com.devoncats.meditrack.presentation.camera.CameraFragment
 import com.devoncats.meditrack.services.FileStorageHelper
 import com.devoncats.meditrack.utils.toCode
@@ -22,21 +21,14 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import dagger.hilt.android.AndroidEntryPoint
 import java.time.DayOfWeek
 import java.time.LocalTime
 
+@AndroidEntryPoint
 class MedFormFragment : Fragment(R.layout.fragment_med_form) {
 
-    private val medicationId: Long
-        get() = arguments?.getLong(NavArgKeys.MEDICATION_ID, MedFormViewModel.NEW_MEDICATION_ID) ?: MedFormViewModel.NEW_MEDICATION_ID
-
-    private val seniorUserId: Long
-        get() = arguments?.getLong(NavArgKeys.SENIOR_USER_ID, MedFormViewModelFactory.NO_SENIOR_USER_ID)
-            ?: MedFormViewModelFactory.NO_SENIOR_USER_ID
-
-    private val viewModel: MedFormViewModel by viewModels {
-        MedFormViewModelFactory(requireContext(), medicationId, seniorUserId)
-    }
+    private val viewModel: MedFormViewModel by viewModels()
 
     private val selectedTimes = sortedSetOf<LocalTime>()
 

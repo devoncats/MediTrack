@@ -13,17 +13,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
-import com.devoncats.meditrack.presentation.NavArgKeys
 import com.google.android.material.button.MaterialButton
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MissedDoseAlertFragment : Fragment(R.layout.fragment_missed_dose_alert) {
 
-    private val logId: Long
-        get() = requireArguments().getLong(NavArgKeys.LOG_ID)
-
-    private val viewModel: MissedDoseAlertViewModel by viewModels {
-        MissedDoseAlertViewModelFactory(requireContext(), logId)
-    }
+    private val viewModel: MissedDoseAlertViewModel by viewModels()
 
     private var phoneToCall: String? = null
 

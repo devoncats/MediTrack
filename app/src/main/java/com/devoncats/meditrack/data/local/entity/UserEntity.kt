@@ -9,7 +9,7 @@ import com.devoncats.meditrack.domain.model.UserRole
 @Entity(
     tableName = "users",
     indices = [
-        Index(value = ["email"], unique = true),
+        Index(value = ["username"], unique = true),
         Index(value = ["caregiverId"])
     ],
     foreignKeys = [
@@ -26,7 +26,7 @@ data class UserEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
-    val email: String,
+    val username: String,
     val passwordHash: String,
     val role: UserRole,
     val caregiverId: Long? = null

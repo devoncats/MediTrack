@@ -27,10 +27,13 @@ import com.devoncats.meditrack.data.local.entity.ScheduleEntity
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.domain.model.WeekDays
 import com.devoncats.meditrack.services.AlarmScheduler
 import com.devoncats.meditrack.services.FileStorageHelper
 import com.devoncats.meditrack.services.MedicationAlarmReceiver
 import com.devoncats.meditrack.utils.PasswordHasher
+import java.time.DayOfWeek
+import java.time.LocalTime
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -58,11 +61,11 @@ class MedDetailFragmentTest {
         sessionManager.clearSession()
 
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        userDao.findByEmail(testEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(testEmail)?.let { userDao.delete(it) }
         userId = userDao.insert(
             UserEntity(
                 name = "MedDetail Test User",
-                email = testEmail,
+                username = testEmail,
                 passwordHash = PasswordHasher.hash("whatever123"),
                 role = UserRole.PATIENT,
                 caregiverId = null
@@ -92,7 +95,7 @@ class MedDetailFragmentTest {
                 status = MedicationLogStatus.PENDING
             )
         )
-        AlarmScheduler(context).schedule(scheduleId, medicationId, "08:00", "MON,TUE,WED,THU,FRI,SAT,SUN")
+        AlarmScheduler(context).schedule(scheduleId, medicationId, LocalTime.of(8, 0), WeekDays(DayOfWeek.entries.toSet()))
     }
 
     private fun existingPendingIntent(scheduleId: Long): PendingIntent? {

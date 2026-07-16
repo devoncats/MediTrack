@@ -36,6 +36,7 @@ import com.devoncats.meditrack.data.local.entity.MedicationEntity
 import com.devoncats.meditrack.data.local.entity.ScheduleEntity
 import com.devoncats.meditrack.data.local.entity.UserEntity
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.domain.model.WeekDays
 import com.devoncats.meditrack.services.FileStorageHelper
 import com.devoncats.meditrack.services.MedicationAlarmReceiver
 import com.devoncats.meditrack.utils.PasswordHasher
@@ -52,6 +53,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
+import java.time.DayOfWeek
+import java.time.LocalTime
 
 @RunWith(AndroidJUnit4::class)
 class MedFormEditFragmentTest {
@@ -69,11 +72,11 @@ class MedFormEditFragmentTest {
         sessionManager.clearSession()
 
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        userDao.findByEmail(testEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(testEmail)?.let { userDao.delete(it) }
         userId = userDao.insert(
             UserEntity(
                 name = "MedForm Edit Test User",
-                email = testEmail,
+                username = testEmail,
                 passwordHash = PasswordHasher.hash("whatever123"),
                 role = UserRole.PATIENT,
                 caregiverId = null
@@ -136,7 +139,12 @@ class MedFormEditFragmentTest {
     fun editingSchedule_cancelsOldAlarmAndSchedulesNewOne() {
         // pre-existing alarm for the old schedule
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        com.devoncats.meditrack.services.AlarmScheduler(context).schedule(oldScheduleId, medicationId, "08:00", "MON,WED")
+        com.devoncats.meditrack.services.AlarmScheduler(context).schedule(
+            oldScheduleId,
+            medicationId,
+            LocalTime.of(8, 0),
+            WeekDays(setOf(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY))
+        )
         assertNotNull(existingPendingIntent(oldScheduleId))
 
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->

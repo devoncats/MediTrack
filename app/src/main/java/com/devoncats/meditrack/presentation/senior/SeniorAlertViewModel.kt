@@ -2,11 +2,15 @@ package com.devoncats.meditrack.presentation.senior
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.devoncats.meditrack.domain.model.MedicationLogStatus
 import com.devoncats.meditrack.domain.repository.MedicationRepository
-import com.devoncats.meditrack.services.AlarmScheduler
+import com.devoncats.meditrack.domain.usecase.ConfirmDoseUseCase
+import com.devoncats.meditrack.presentation.NavArgKeys
+import com.devoncats.meditrack.utils.toHHmm
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 data class SeniorAlertInfo(
@@ -15,11 +19,14 @@ data class SeniorAlertInfo(
     val scheduledTime: String
 )
 
-class SeniorAlertViewModel(
+@HiltViewModel
+class SeniorAlertViewModel @Inject constructor(
     private val medicationRepository: MedicationRepository,
-    private val alarmScheduler: AlarmScheduler,
-    private val scheduleId: Long
+    private val confirmDoseUseCase: ConfirmDoseUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val scheduleId: Long = savedStateHandle.get<Long>(NavArgKeys.SCHEDULE_ID) ?: -1L
 
     private val _alertInfo = MutableLiveData<SeniorAlertInfo?>()
     val alertInfo: LiveData<SeniorAlertInfo?> = _alertInfo
@@ -41,7 +48,7 @@ class SeniorAlertViewModel(
             _alertInfo.value = SeniorAlertInfo(
                 medicationName = medication.name,
                 dose = medication.dose,
-                scheduledTime = schedule.time
+                scheduledTime = schedule.time.toHHmm()
             )
         }
     }
@@ -49,15 +56,7 @@ class SeniorAlertViewModel(
     fun confirm() {
         val currentLogId = logId ?: return
         viewModelScope.launch {
-            val log = medicationRepository.getLogById(currentLogId) ?: return@launch
-            medicationRepository.updateLog(
-                log.copy(confirmedAt = System.currentTimeMillis(), status = MedicationLogStatus.CONFIRMED)
-            )
-            // Line up the next occurrence now that this dose is resolved; this also
-            // supersedes the still-pending missed-dose check for this dose.
-            medicationRepository.getScheduleById(scheduleId)?.let { schedule ->
-                alarmScheduler.schedule(scheduleId, log.medicationId, schedule.time, schedule.daysOfWeek)
-            }
+            confirmDoseUseCase(currentLogId, scheduleId)
             _closeScreen.value = Unit
         }
     }

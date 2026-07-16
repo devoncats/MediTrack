@@ -4,8 +4,9 @@ import com.devoncats.meditrack.data.local.dao.EmergencyContactDao
 import com.devoncats.meditrack.data.local.entity.EmergencyContactEntity
 import com.devoncats.meditrack.domain.model.EmergencyContact
 import com.devoncats.meditrack.domain.repository.EmergencyContactRepository
+import javax.inject.Inject
 
-class EmergencyContactRepositoryImpl(
+class EmergencyContactRepositoryImpl @Inject constructor(
     private val emergencyContactDao: EmergencyContactDao
 ) : EmergencyContactRepository {
 

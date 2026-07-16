@@ -8,12 +8,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devoncats.meditrack.R
 import com.devoncats.meditrack.presentation.logout
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SeniorMedListFragment : Fragment(R.layout.fragment_senior_med_list) {
 
-    private val viewModel: SeniorMedListViewModel by viewModels {
-        SeniorMedListViewModelFactory(requireContext())
-    }
+    private val viewModel: SeniorMedListViewModel by viewModels()
 
     override fun onResume() {
         super.onResume()

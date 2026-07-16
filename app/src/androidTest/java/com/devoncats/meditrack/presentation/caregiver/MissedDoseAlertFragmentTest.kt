@@ -56,13 +56,13 @@ class MissedDoseAlertFragmentTest {
         val medicationLogDao = MediTrackDatabase.getInstance(context).medicationLogDao()
         val emergencyContactDao = MediTrackDatabase.getInstance(context).emergencyContactDao()
 
-        userDao.findByEmail(seniorWithContactEmail)?.let { userDao.delete(it) }
-        userDao.findByEmail(seniorNoContactEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(seniorWithContactEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(seniorNoContactEmail)?.let { userDao.delete(it) }
 
         val seniorWithContactId = userDao.insert(
             UserEntity(
                 name = "Rosa Contact Test",
-                email = seniorWithContactEmail,
+                username = seniorWithContactEmail,
                 passwordHash = PasswordHasher.hash("123456"),
                 role = UserRole.SENIOR_PATIENT,
                 caregiverId = caregiverId
@@ -94,7 +94,7 @@ class MissedDoseAlertFragmentTest {
         val seniorNoContactId = userDao.insert(
             UserEntity(
                 name = "Sin Contacto Test",
-                email = seniorNoContactEmail,
+                username = seniorNoContactEmail,
                 passwordHash = PasswordHasher.hash("123456"),
                 role = UserRole.SENIOR_PATIENT,
                 caregiverId = caregiverId

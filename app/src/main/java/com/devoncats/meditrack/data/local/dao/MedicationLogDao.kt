@@ -1,6 +1,5 @@
 package com.devoncats.meditrack.data.local.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -8,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.devoncats.meditrack.data.local.entity.MedicationLogEntity
 import com.devoncats.meditrack.domain.model.MedicationLogStatus
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MedicationLogDao {
@@ -30,7 +30,7 @@ interface MedicationLogDao {
     suspend fun findLatestPendingBySchedule(scheduleId: Long): MedicationLogEntity?
 
     @Query("SELECT * FROM medication_logs WHERE medicationId = :medicationId ORDER BY scheduledDatetime DESC")
-    fun observeByMedication(medicationId: Long): LiveData<List<MedicationLogEntity>>
+    fun observeByMedication(medicationId: Long): Flow<List<MedicationLogEntity>>
 
     @Query(
         "SELECT * FROM medication_logs WHERE medicationId = :medicationId " +
@@ -41,7 +41,7 @@ interface MedicationLogDao {
         medicationId: Long,
         startInclusive: Long,
         endExclusive: Long
-    ): LiveData<List<MedicationLogEntity>>
+    ): Flow<List<MedicationLogEntity>>
 
     @Query(
         """
@@ -56,7 +56,7 @@ interface MedicationLogDao {
         ownerUserId: Long,
         startInclusive: Long,
         endExclusive: Long
-    ): LiveData<List<MedicationLogEntity>>
+    ): Flow<List<MedicationLogEntity>>
 
     @Query(
         """
@@ -71,7 +71,7 @@ interface MedicationLogDao {
         ORDER BY medication_logs.scheduledDatetime DESC
         """
     )
-    fun observeMissedDoseAlertsForCaregiver(caregiverId: Long): LiveData<List<MissedDoseAlertRow>>
+    fun observeMissedDoseAlertsForCaregiver(caregiverId: Long): Flow<List<MissedDoseAlertRow>>
 
     @Query(
         """
@@ -89,7 +89,7 @@ interface MedicationLogDao {
         caregiverId: Long,
         startInclusive: Long,
         endExclusive: Long
-    ): LiveData<List<SeniorTodayLogRow>>
+    ): Flow<List<SeniorTodayLogRow>>
 }
 
 data class MissedDoseAlertRow(

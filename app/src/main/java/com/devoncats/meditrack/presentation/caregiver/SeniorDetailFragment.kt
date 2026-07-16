@@ -19,7 +19,9 @@ import com.devoncats.meditrack.presentation.patient.MedicationListAdapter
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SeniorDetailFragment : Fragment(R.layout.fragment_senior_detail) {
 
     private val seniorUserId: Long
@@ -28,13 +30,9 @@ class SeniorDetailFragment : Fragment(R.layout.fragment_senior_detail) {
     private val seniorName: String
         get() = requireArguments().getString(NavArgKeys.SENIOR_NAME).orEmpty()
 
-    private val viewModel: MedListViewModel by viewModels {
-        SeniorDetailViewModelFactory(requireContext(), seniorUserId)
-    }
+    private val viewModel: MedListViewModel by viewModels()
 
-    private val emergencyContactViewModel: EmergencyContactViewModel by viewModels {
-        EmergencyContactViewModelFactory(requireContext(), seniorUserId)
-    }
+    private val emergencyContactViewModel: EmergencyContactViewModel by viewModels()
 
     override fun onResume() {
         super.onResume()

@@ -33,12 +33,12 @@ class BootReceiverTest {
     @Test
     fun bootCompleted_reschedulesAlarmsClearedByTheReboot(): Unit = runBlocking {
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        val email = "boot-receiver-test@meditrack.com"
-        userDao.findByEmail(email)?.let { userDao.delete(it) }
+        val username = "boot-receiver-test@meditrack.com"
+        userDao.findByUsername(username)?.let { userDao.delete(it) }
         val userId = userDao.insert(
             UserEntity(
                 name = "Boot Receiver Test User",
-                email = email,
+                username = username,
                 passwordHash = PasswordHasher.hash("whatever123"),
                 role = UserRole.PATIENT,
                 caregiverId = null

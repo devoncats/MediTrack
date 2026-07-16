@@ -36,7 +36,7 @@ class ScheduleDaoTest {
         val ownerUserId = database.userDao().insert(
             UserEntity(
                 name = "Owner",
-                email = "owner@meditrack.com",
+                username = "owner@meditrack.com",
                 passwordHash = PasswordHasher.hash("password123"),
                 role = UserRole.PATIENT,
                 caregiverId = null

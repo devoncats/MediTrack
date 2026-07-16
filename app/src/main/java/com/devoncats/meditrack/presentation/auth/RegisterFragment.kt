@@ -10,14 +10,15 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
 import com.devoncats.meditrack.domain.model.UserRole
+import com.devoncats.meditrack.domain.usecase.RegisterResult
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RegisterFragment : Fragment(R.layout.fragment_register) {
 
-    private val viewModel: RegisterViewModel by viewModels {
-        RegisterViewModelFactory(requireContext())
-    }
+    private val viewModel: RegisterViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

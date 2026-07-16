@@ -33,11 +33,11 @@ class MainActivitySessionTest {
         sessionManager.clearSession()
 
         val userDao = MediTrackDatabase.getInstance(context).userDao()
-        userDao.findByEmail(testEmail)?.let { userDao.delete(it) }
+        userDao.findByUsername(testEmail)?.let { userDao.delete(it) }
         userDao.insert(
             UserEntity(
                 name = "Session Test User",
-                email = testEmail,
+                username = testEmail,
                 passwordHash = PasswordHasher.hash("whatever123"),
                 role = UserRole.PATIENT,
                 caregiverId = null
@@ -53,7 +53,7 @@ class MainActivitySessionTest {
     @Test
     fun activeSession_skipsLoginAndShowsRoleGraphDirectly() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val user = runBlocking { MediTrackDatabase.getInstance(context).userDao().findByEmail(testEmail)!! }
+        val user = runBlocking { MediTrackDatabase.getInstance(context).userDao().findByUsername(testEmail)!! }
         sessionManager.saveSession(user.id, UserRole.PATIENT.name)
 
         ActivityScenario.launch(MainActivity::class.java).use {
@@ -65,7 +65,7 @@ class MainActivitySessionTest {
     fun logout_clearsSessionAndRedirectsToLogin() {
         runBlocking {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
-            val user = MediTrackDatabase.getInstance(context).userDao().findByEmail(testEmail)!!
+            val user = MediTrackDatabase.getInstance(context).userDao().findByUsername(testEmail)!!
             sessionManager.saveSession(user.id, UserRole.PATIENT.name)
         }
 
@@ -94,7 +94,7 @@ class MainActivitySessionTest {
         // Regression test: a config change (e.g. rotation) recreates the Activity, which used
         // to unconditionally re-run the session redirect and reset the back stack.
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val user = runBlocking { MediTrackDatabase.getInstance(context).userDao().findByEmail(testEmail)!! }
+        val user = runBlocking { MediTrackDatabase.getInstance(context).userDao().findByUsername(testEmail)!! }
         sessionManager.saveSession(user.id, UserRole.PATIENT.name)
 
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->

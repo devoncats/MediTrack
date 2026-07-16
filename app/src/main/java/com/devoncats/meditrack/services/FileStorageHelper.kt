@@ -4,9 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
+import javax.inject.Inject
 
-class FileStorageHelper(private val context: Context) {
+class FileStorageHelper @Inject constructor(@ApplicationContext private val context: Context) {
 
     fun savePhoto(uri: Uri): String {
         val photosDir = File(context.filesDir, MEDICATIONS_DIR).apply { mkdirs() }

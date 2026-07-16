@@ -13,12 +13,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.devoncats.meditrack.data.local.MediTrackDatabase
-import com.devoncats.meditrack.data.local.entity.MedicationEntity
-import com.devoncats.meditrack.data.local.entity.ScheduleEntity
-import com.devoncats.meditrack.data.local.entity.UserEntity
-import com.devoncats.meditrack.domain.model.UserRole
-import com.devoncats.meditrack.utils.PasswordHasher
+import com.devoncats.meditrack.domain.model.WeekDays
+import java.time.DayOfWeek
+import java.time.LocalTime
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -48,7 +45,7 @@ class AlarmSchedulerTest {
         val scheduleId = 4_001L
         alarmScheduler.cancel(scheduleId)
 
-        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = LocalTime.of(8, 0), daysOfWeek = WeekDays(DayOfWeek.entries.toSet()))
 
         assertNotNull(existingPendingIntent(scheduleId))
 
@@ -58,61 +55,12 @@ class AlarmSchedulerTest {
     @Test
     fun cancel_removesThePendingIntent() {
         val scheduleId = 4_002L
-        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = LocalTime.of(8, 0), daysOfWeek = WeekDays(DayOfWeek.entries.toSet()))
         assertNotNull(existingPendingIntent(scheduleId))
 
         alarmScheduler.cancel(scheduleId)
 
         assertNull(existingPendingIntent(scheduleId))
-    }
-
-    @Test
-    fun rescheduleAll_reprogramsEveryScheduleFoundInRoom(): Unit = runBlocking {
-        val userDao = MediTrackDatabase.getInstance(context).userDao()
-        val email = "alarm-reschedule-test@meditrack.com"
-        userDao.findByEmail(email)?.let { userDao.delete(it) }
-        val userId = userDao.insert(
-            UserEntity(
-                name = "Reschedule Test User",
-                email = email,
-                passwordHash = PasswordHasher.hash("whatever123"),
-                role = UserRole.PATIENT,
-                caregiverId = null
-            )
-        )
-        val medicationDao = MediTrackDatabase.getInstance(context).medicationDao()
-        val medicationId = medicationDao.insert(
-            MedicationEntity(
-                name = "Test Med",
-                dose = "1",
-                frequency = "diaria",
-                instructions = null,
-                ownerUserId = userId,
-                photoUri = null,
-                createdAt = System.currentTimeMillis()
-            )
-        )
-        val scheduleDao = MediTrackDatabase.getInstance(context).scheduleDao()
-        val scheduleId1 = scheduleDao.insert(
-            ScheduleEntity(medicationId = medicationId, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
-        )
-        val scheduleId2 = scheduleDao.insert(
-            ScheduleEntity(medicationId = medicationId, time = "20:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
-        )
-
-        // Simulate the alarms having been cleared, e.g. by a device reboot.
-        alarmScheduler.cancel(scheduleId1)
-        alarmScheduler.cancel(scheduleId2)
-        assertNull(existingPendingIntent(scheduleId1))
-        assertNull(existingPendingIntent(scheduleId2))
-
-        alarmScheduler.rescheduleAll()
-
-        assertNotNull(existingPendingIntent(scheduleId1))
-        assertNotNull(existingPendingIntent(scheduleId2))
-
-        alarmScheduler.cancel(scheduleId1)
-        alarmScheduler.cancel(scheduleId2)
     }
 
     @Test
@@ -122,7 +70,7 @@ class AlarmSchedulerTest {
         val workManager = WorkManager.getInstance(context)
         alarmScheduler.cancel(scheduleId)
 
-        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = "08:00", daysOfWeek = "MON,TUE,WED,THU,FRI,SAT,SUN")
+        alarmScheduler.schedule(scheduleId, medicationId = 1L, time = LocalTime.of(8, 0), daysOfWeek = WeekDays(DayOfWeek.entries.toSet()))
 
         val enqueuedInfos = workManager.getWorkInfosForUniqueWork(workName).get()
         assertTrue(

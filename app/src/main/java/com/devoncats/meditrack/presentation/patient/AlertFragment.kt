@@ -7,17 +7,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.devoncats.meditrack.R
-import com.devoncats.meditrack.presentation.NavArgKeys
 import com.google.android.material.button.MaterialButton
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AlertFragment : Fragment(R.layout.fragment_alert) {
 
-    private val scheduleId: Long
-        get() = arguments?.getLong(NavArgKeys.SCHEDULE_ID, -1L) ?: -1L
-
-    private val viewModel: AlertViewModel by viewModels {
-        AlertViewModelFactory(requireContext(), scheduleId)
-    }
+    private val viewModel: AlertViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

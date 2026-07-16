@@ -1,12 +1,12 @@
 package com.devoncats.meditrack.data.local.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.devoncats.meditrack.data.local.entity.ScheduleEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ScheduleDao {
@@ -29,5 +29,5 @@ interface ScheduleDao {
     suspend fun getAll(): List<ScheduleEntity>
 
     @Query("SELECT * FROM schedules WHERE medicationId = :medicationId")
-    fun observeByMedication(medicationId: Long): LiveData<List<ScheduleEntity>>
+    fun observeByMedication(medicationId: Long): Flow<List<ScheduleEntity>>
 }
